@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "shares"
+name = "stocktrader"
 version = "0.1.0"
 description = "Application for trading on stock markets"
 authors = ["twelve <kana.suzucki@gmail.com>"]

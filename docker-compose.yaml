@@ -1,16 +1,16 @@
 version: '3.7'
 services:
   web:
-    build: ./shares
-    container_name: shares
+    build: ./stocktrader
+    container_name: stocktrader
     entrypoint:
       - ./django-entrypoint.sh
     volumes:
-      - .:/shares/code
+      - .:/stocktrader/code
     ports:
       - 8000:8000
     env_file:
-      - ./shares/.env
+      - ./stocktrader/.env
     depends_on:
       - db
 
@@ -18,6 +18,6 @@ services:
     image: postgres:14.4-alpine
     container_name: postgres
     volumes:
-      - ./shares/postgres/database:/var/lib/postgresql/data
+      - ./stocktrader/postgres/database:/var/lib/postgresql/data
     env_file:
-      - ./shares/.env
+      - ./stocktrader/.env

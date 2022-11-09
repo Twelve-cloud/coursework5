@@ -1,5 +1,5 @@
 """
-ASGI config for shares project.
+ASGI config for stocktrader project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -12,5 +12,5 @@ from django.core.asgi import get_asgi_application
 import os
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shares.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stocktrader.settings')
 application = get_asgi_application()

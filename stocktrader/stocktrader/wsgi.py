@@ -1,5 +1,5 @@
 """
-WSGI config for shares project.
+WSGI config for stocktrader project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -12,5 +12,5 @@ from django.core.wsgi import get_wsgi_application
 import os
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shares.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'stocktrader.settings')
 application = get_wsgi_application()
