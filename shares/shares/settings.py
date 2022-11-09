@@ -14,6 +14,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 
 
+# -------------------------- MAIN SETTINGS ------------------------------------
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = '+zb2fay@2dqu&a19fstkhpb7n^s!657ib+pd%ib+&6a=a&9mpv'
@@ -21,6 +23,12 @@ SECRET_KEY = '+zb2fay@2dqu&a19fstkhpb7n^s!657ib+pd%ib+&6a=a&9mpv'
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+ROOT_URLCONF = 'shares.urls'
+
+DEFAULT_CHARSET = 'utf8'
+
+# -------------------------- INSTALLED APPS -----------------------------------
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+# -------------------------- MIDDLEWARES --------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -41,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'shares.urls'
+# --------------------------- TEMPLATES ---------------------------------------
 
 TEMPLATES = [
     {
@@ -59,7 +69,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'shares.wsgi.application'
+# ---------------------------- DATABASES --------------------------------------
 
 DATABASES = {
     'default': {
@@ -67,6 +77,20 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# ------------------------- LANGUAGE SETTINGS ---------------------------------
+
+LANGUAGE_CODE = 'en-us'
+
+USE_I18N = True
+
+USE_L18N = True
+
+TIME_ZONE = 'UTC'
+
+USE_TZ = True
+
+# -------------------------- OTHER SETTINGS -----------------------------------
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -95,13 +119,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'UTC'
-
-USE_I18N = True
-
-USE_TZ = True
+WSGI_APPLICATION = 'shares.wsgi.application'
 
 STATIC_URL = 'static/'
 
