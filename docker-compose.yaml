@@ -1,0 +1,23 @@
+version: '3.7'
+services:
+  web:
+    build: ./shares
+    container_name: shares
+    entrypoint:
+      - ./django-entrypoint.sh
+    volumes:
+      - .:/shares/code
+    ports:
+      - 8000:8000
+    env_file:
+      - ./shares/.env
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14.4-alpine
+    container_name: postgres
+    volumes:
+      - ./shares/postgres/database:/var/lib/postgresql/data
+    env_file:
+      - ./shares/.env
