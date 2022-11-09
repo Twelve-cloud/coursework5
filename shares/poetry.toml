@@ -1,0 +1,4 @@
+cache-dir = "/home/bleeding_soul/Projects/coursework5/shares/.poetry-cache"
+[virtualenvs]
+in-project = true
+prefer-active-python = true
