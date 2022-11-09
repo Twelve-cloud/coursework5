@@ -41,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'shares.apps.SharesConfig',
+    'jauth.apps.JauthConfig',
+    'user.apps.UserConfig',
 ]
 
 # -------------------------- MIDDLEWARES --------------------------------------
