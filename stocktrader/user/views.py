@@ -1,3 +1,13 @@
-from django.shortcuts import render
+from user.serializers import BasicUserSerializer
+from user.serializers import FullUserSerializer
+from rest_framework import viewsets
+from user.models import User
 
-# Create your views here.
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return FullUserSerializer
+        return BasicUserSerializer

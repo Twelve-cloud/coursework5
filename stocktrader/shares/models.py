@@ -14,7 +14,7 @@ class Broker(models.Model):
     )
 
     type = models.CharField(
-        max_length='2',
+        max_length=2,
         choices=Types.choices,
         verbose_name='Type'
     )
@@ -109,6 +109,8 @@ class Account(models.Model):
 
     broker = models.ForeignKey(
         'Broker',
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         verbose_name='Broker',
         related_name='accounts'
