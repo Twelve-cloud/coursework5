@@ -22,4 +22,5 @@ from django.contrib import admin
 urlpatterns = [
     path('api/v1/admin/', admin.site.urls),
     path('api/v1/user/', include('user.urls')),
+    path('api/v1/shares/', include('shares.urls')),
 ]
