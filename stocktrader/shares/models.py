@@ -13,6 +13,10 @@ class Broker(models.Model):
         verbose_name='Name'
     )
 
+    description = models.TextField(
+        verbose_name='Description',
+    )
+
     type = models.CharField(
         max_length=2,
         choices=Types.choices,
@@ -85,7 +89,7 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f'{self.pk}. {self.broker}[{self.type}]'
+        return f'{self.pk}. {self.broker.name}[{self.type}]'
 
     def get_absolute_url(self):
         return f'/orders/{self.pk}/'
@@ -95,6 +99,10 @@ class Deal(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Created'
+    )
+
+    description = models.TextField(
+        verbose_name='Description',
     )
 
     broker = models.ForeignKey(
