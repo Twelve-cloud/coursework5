@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'shares.apps.SharesConfig',
     'jauth.apps.JauthConfig',
     'user.apps.UserConfig',
+    'rest_framework'
 ]
 
 # -------------------------- MIDDLEWARES --------------------------------------
@@ -136,3 +137,5 @@ WSGI_APPLICATION = 'stocktrader.wsgi.application'
 STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'user.User'
