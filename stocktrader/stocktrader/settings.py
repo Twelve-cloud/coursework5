@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'jauth.middlewares.JWTMiddleware'
 ]
 
 # --------------------------- TEMPLATES ---------------------------------------
@@ -139,3 +140,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'user.User'
+
+# --------------------------- JWT SETTINGS ------------------------------------
+JWT_TOKEN = {
+    'ACCESS_TOKEN_LIFETIME_MINUTES': 15,
+    'REFRESH_TOKEN_LIFETIME_DAYS': 30,
+    'ALGORITHMS': ['HS256'],
+    'SECURE': True,
+    'HTTP_ONLY': True,
+}
