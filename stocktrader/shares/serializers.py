@@ -13,6 +13,11 @@ class BrokerSerializer(serializers.ModelSerializer):
         read_only=True
     )
 
+    orders = serializers.PrimaryKeyRelatedField(
+        many=True,
+        read_only=True
+    )
+
     class Meta:
         model = Broker
         fields = (
@@ -22,11 +27,13 @@ class BrokerSerializer(serializers.ModelSerializer):
             'rate',
             'deals',
             'accounts',
+            'orders',
         )
         read_only_fields = (
             'id',
             'deals',
             'accounts',
+            'orders',
         )
 
 
@@ -41,9 +48,11 @@ class OrderSerializer(serializers.ModelSerializer):
             'id',
             'type',
             'status',
+            'currency',
             'amount',
             'price',
-            'deal'
+            'broker',
+            'deal',
         )
         read_only_fields = (
             'id',
