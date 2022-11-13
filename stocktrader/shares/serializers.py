@@ -23,6 +23,7 @@ class BrokerSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'name',
+            'description',
             'type',
             'rate',
             'deals',
@@ -66,6 +67,7 @@ class DealSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'created_at',
+            'description',
             'broker',
             'user',
             'order',
@@ -84,7 +86,7 @@ class AccountSerializer(serializers.ModelSerializer):
             'balance',
             'currency',
             'broker',
-            'user'
+            'user',
         )
         read_only_fields = (
             'id',
