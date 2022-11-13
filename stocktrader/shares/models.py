@@ -25,6 +25,12 @@ class Broker(models.Model):
         verbose_name='Rate'
     )
 
+    def __str__(self):
+        return f'{self.pk}. {self.name}'
+
+    def get_absolute_url(self):
+        return f'/brokers/{self.pk}/'
+
 
 class Order(models.Model):
     class Types(models.TextChoices):
@@ -36,6 +42,12 @@ class Order(models.Model):
         PROCCESS = 'pc', 'Process'
         DONE = 'dn', 'Done'
         __empty__ = 'Choose status'
+
+    class Currency(models.TextChoices):
+        USD = 'usd', 'Dollar'
+        EUR = 'eur', 'Euro'
+        RUB = 'rub', 'Ruble'
+        __empty__ = 'Choose currency'
 
     type = models.CharField(
         max_length=2,
@@ -49,6 +61,12 @@ class Order(models.Model):
         verbose_name='Status'
     )
 
+    currency = models.CharField(
+        max_length=3,
+        choices=Currency.choices,
+        verbose_name='Currency'
+    )
+
     amount = models.IntegerField(
         verbose_name='Amount'
     )
@@ -58,6 +76,19 @@ class Order(models.Model):
         decimal_places=3,
         verbose_name='Price'
     )
+
+    broker = models.ForeignKey(
+        'Broker',
+        on_delete=models.CASCADE,
+        verbose_name='Broker',
+        related_name='orders'
+    )
+
+    def __str__(self):
+        return f'{self.pk}. {self.broker}[{self.type}]'
+
+    def get_absolute_url(self):
+        return f'/orders/{self.pk}/'
 
 
 class Deal(models.Model):
@@ -86,6 +117,12 @@ class Deal(models.Model):
         verbose_name='Order',
         related_name='deal'
     )
+
+    def __str__(self):
+        return f'{self.pk}. {self.user.username}[{self.created_at}]'
+
+    def get_absolute_url(self):
+        return f'/deals/{self.pk}/'
 
 
 class Account(models.Model):
@@ -122,3 +159,9 @@ class Account(models.Model):
         verbose_name='User',
         related_name='accounts'
     )
+
+    def __str__(self):
+        return f'{self.pk}. {self.user.username}[{self.balance}]'
+
+    def get_absolute_url(self):
+        return f'/accounts/{self.pk}/'
