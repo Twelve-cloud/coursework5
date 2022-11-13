@@ -89,7 +89,7 @@ class Order(models.Model):
     )
 
     def __str__(self):
-        return f'{self.pk}. {self.broker.name}[{self.type}]'
+        return f'{self.pk}. {self.broker.name}[{self.get_type_display()}]'
 
     def get_absolute_url(self):
         return f'/orders/{self.pk}/'
