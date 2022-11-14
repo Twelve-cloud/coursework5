@@ -1,8 +1,8 @@
 from shares.serializers import (
     BrokerSerializer, OrderSerializer, AccountSerializer
 )
+from shares.permissions import IsOrderCreatorOrAdmin, IsBalanceOwnerOrAdmin
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from shares.permissions import IsOrderCreator, IsBalanceOwner
 from shares.models import Broker, Order, Account
 from rest_framework import viewsets, mixins
 
@@ -53,18 +53,15 @@ class OrderViewSet(mixins.CreateModelMixin,
         ),
         'list': (
             IsAuthenticated,
-            IsOrderCreator,
-            IsAdminUser,
+            IsOrderCreatorOrAdmin,
         ),
         'retrieve': (
             IsAuthenticated,
-            IsOrderCreator,
-            IsAdminUser,
+            IsOrderCreatorOrAdmin,
         ),
         'destroy': (
             IsAuthenticated,
-            IsOrderCreator,
-            IsAdminUser,
+            IsOrderCreatorOrAdmin,
         )
     }
 
@@ -86,18 +83,15 @@ class AccountViewSet(mixins.CreateModelMixin,
         ),
         'list': (
             IsAuthenticated,
-            IsBalanceOwner,
-            IsAdminUser,
+            IsBalanceOwnerOrAdmin,
         ),
         'retrieve': (
             IsAuthenticated,
-            IsBalanceOwner,
-            IsAdminUser,
+            IsBalanceOwnerOrAdmin,
         ),
         'destroy': (
             IsAuthenticated,
-            IsBalanceOwner,
-            IsAdminUser,
+            IsBalanceOwnerOrAdmin,
         )
     }
 

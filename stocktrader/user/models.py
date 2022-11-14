@@ -29,13 +29,10 @@ class User(AbstractUser):
     follows = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='followers',
         verbose_name='Follows'
-    )
-
-    followers = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        verbose_name='Followers'
     )
 
     USERNAME_FIELD = 'email'

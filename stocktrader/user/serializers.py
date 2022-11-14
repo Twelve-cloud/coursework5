@@ -23,11 +23,12 @@ class UserSerializer(serializers.ModelSerializer):
             'first_name',
             'last_name',
             'image',
-            'follows',
-            'followers',
             'orders',
             'accounts',
         )
         read_only_fields = (
             'id',
         )
+
+    def create(self, validated_data):
+        return User.objects.create_user(**validated_data)

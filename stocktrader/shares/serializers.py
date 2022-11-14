@@ -32,10 +32,6 @@ class BrokerSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    deal = serializers.PrimaryKeyRelatedField(
-        read_only=True
-    )
-
     class Meta:
         model = Order
         fields = (
