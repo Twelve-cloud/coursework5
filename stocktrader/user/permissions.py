@@ -1,12 +1,10 @@
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
-from django.contrib.auth.models import AnonymousUser
 from rest_framework import permissions
 
 
 class IsUserOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return not isinstance(request.user, AnonymousUser) and \
-            obj == request.user
+        return request.user == obj
 
 
 class IsUserOwnerOrAdmin(permissions.BasePermission):

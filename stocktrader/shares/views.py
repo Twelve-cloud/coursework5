@@ -2,6 +2,7 @@ from shares.serializers import (
     BrokerSerializer, OrderSerializer, AccountSerializer
 )
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from shares.permissions import IsOrderCreator, IsBalanceOwner
 from shares.models import Broker, Order, Account
 from rest_framework import viewsets, mixins
 
@@ -72,30 +73,31 @@ class OrderViewSet(mixins.CreateModelMixin,
         return super(self.__class__, self).get_permissions()
 
 
-class AccountViewSet(viewsets.ModelViewSet):
+class AccountViewSet(mixins.CreateModelMixin,
+                     mixins.RetrieveModelMixin,
+                     mixins.DestroyModelMixin,
+                     mixins.ListModelMixin,
+                     viewsets.GenericViewSet):
     queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_map = {
         'create': (
-            IsNotAuthentificated,
+            IsAuthenticated,
         ),
         'list': (
+            IsAuthenticated,
             IsBalanceOwner,
+            IsAdminUser,
         ),
         'retrieve': (
             IsAuthenticated,
-        ),
-        'update': (
-            IsAuthenticated,
-            IsUserOwner,
-        ),
-        'partial_update': (
-            IsAuthenticated,
-            IsUserOwner,
+            IsBalanceOwner,
+            IsAdminUser,
         ),
         'destroy': (
             IsAuthenticated,
-            IsUserOwner,
+            IsBalanceOwner,
+            IsAdminUser,
         )
     }
 
