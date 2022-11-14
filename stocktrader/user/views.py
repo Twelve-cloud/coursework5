@@ -1,5 +1,8 @@
-from user.permissions import IsUserOwner, IsNotAuthentificated
-from rest_framework.permissions import IsAuthenticated
+from user.permissions import (
+    IsUserOwner, IsUserOwnerOrAdmin, IsNotAuthentificatedOrAdmin,
+    IsNotUserOwner, IsNotUserBanned
+)
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from user.serializers import UserSerializer
 from rest_framework import viewsets
 from user.models import User
@@ -10,7 +13,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_map = {
         'create': (
-            IsNotAuthentificated,
+            IsNotAuthentificatedOrAdmin,
         ),
         'list': (
             IsAuthenticated,
@@ -28,8 +31,18 @@ class UserViewSet(viewsets.ModelViewSet):
         ),
         'destroy': (
             IsAuthenticated,
-            IsUserOwner,
-        )
+            IsUserOwnerOrAdmin,
+        ),
+        'ban': (
+            IsAuthenticated,
+            IsAdminUser,
+            IsNotUserBanned,
+        ),
+        'follow': (
+            IsAuthenticated,
+            IsNotUserOwner,
+            IsNotUserBanned,
+        ),
     }
 
     def get_permissions(self):
