@@ -3,6 +3,7 @@ from shares.serializers import (
 )
 from shares.permissions import IsOrderCreatorOrAdmin, IsBalanceOwnerOrAdmin
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from django.contrib.auth.models import AnonymousUser
 from shares.models import Broker, Order, Account
 from rest_framework import viewsets, mixins
 
@@ -32,7 +33,7 @@ class BrokerViewSet(viewsets.ModelViewSet):
         'destroy': (
             IsAuthenticated,
             IsAdminUser
-        )
+        ),
     }
 
     def get_permissions(self):
@@ -45,7 +46,6 @@ class OrderViewSet(mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    mixins.ListModelMixin,
                    viewsets.GenericViewSet):
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_map = {
         'create': (
@@ -53,21 +53,26 @@ class OrderViewSet(mixins.CreateModelMixin,
         ),
         'list': (
             IsAuthenticated,
-            IsOrderCreatorOrAdmin,
         ),
         'retrieve': (
             IsAuthenticated,
-            IsOrderCreatorOrAdmin,
         ),
         'destroy': (
             IsAuthenticated,
             IsOrderCreatorOrAdmin,
-        )
+        ),
     }
 
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    def get_queryset(self):
+        user = self.request.user
+        if not isinstance(user, AnonymousUser) and user.is_staff is True:
+            return Order.objects.all()
+        else:
+            return user.orders.all()
 
 
 class AccountViewSet(mixins.CreateModelMixin,
@@ -75,7 +80,6 @@ class AccountViewSet(mixins.CreateModelMixin,
                      mixins.DestroyModelMixin,
                      mixins.ListModelMixin,
                      viewsets.GenericViewSet):
-    queryset = Account.objects.all()
     serializer_class = AccountSerializer
     permission_map = {
         'create': (
@@ -83,18 +87,23 @@ class AccountViewSet(mixins.CreateModelMixin,
         ),
         'list': (
             IsAuthenticated,
-            IsBalanceOwnerOrAdmin,
         ),
         'retrieve': (
             IsAuthenticated,
-            IsBalanceOwnerOrAdmin,
         ),
         'destroy': (
             IsAuthenticated,
             IsBalanceOwnerOrAdmin,
-        )
+        ),
     }
 
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
+
+    def get_queryset(self):
+        user = self.request.user
+        if not isinstance(user, AnonymousUser) and user.is_staff is True:
+            return Account.objects.all()
+        else:
+            return user.accounts.all()
