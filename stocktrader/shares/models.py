@@ -71,6 +71,15 @@ class Order(models.Model):
         verbose_name='Currency'
     )
 
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Created'
+    )
+
+    description = models.TextField(
+        verbose_name='Description',
+    )
+
     amount = models.IntegerField(
         verbose_name='Amount'
     )
@@ -88,49 +97,18 @@ class Order(models.Model):
         related_name='orders'
     )
 
+    user = models.ForeignKey(
+        'user.User',
+        on_delete=models.CASCADE,
+        verbose_name='User',
+        related_name='orders'
+    )
+
     def __str__(self):
         return f'{self.pk}. {self.broker.name}[{self.get_type_display()}]'
 
     def get_absolute_url(self):
         return f'/orders/{self.pk}/'
-
-
-class Deal(models.Model):
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Created'
-    )
-
-    description = models.TextField(
-        verbose_name='Description',
-    )
-
-    broker = models.ForeignKey(
-        'Broker',
-        on_delete=models.CASCADE,
-        verbose_name='Broker',
-        related_name='deals'
-    )
-
-    user = models.ForeignKey(
-        'user.User',
-        on_delete=models.CASCADE,
-        verbose_name='User',
-        related_name='deals'
-    )
-
-    order = models.OneToOneField(
-        'Order',
-        on_delete=models.PROTECT,
-        verbose_name='Order',
-        related_name='deal'
-    )
-
-    def __str__(self):
-        return f'{self.pk}. {self.user.username}[{self.created_at}]'
-
-    def get_absolute_url(self):
-        return f'/deals/{self.pk}/'
 
 
 class Account(models.Model):
@@ -166,6 +144,11 @@ class Account(models.Model):
         on_delete=models.CASCADE,
         verbose_name='User',
         related_name='accounts'
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name='Updated'
     )
 
     def __str__(self):

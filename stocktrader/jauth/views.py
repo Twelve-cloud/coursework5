@@ -45,7 +45,7 @@ class AuthViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['get'])
     def verify_email(self, request):
-        user_token = request.GET.get('token', None)
+        user_token = request.GET.get('token', None) # change it to query_params from DRF
         payload = get_payload_by_token(user_token)
 
         if payload is None:

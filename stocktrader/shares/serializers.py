@@ -1,19 +1,14 @@
-from shares.models import Broker, Order, Deal, Account
+from shares.models import Broker, Order, Account
 from rest_framework import serializers
 
 
 class BrokerSerializer(serializers.ModelSerializer):
-    deals = serializers.PrimaryKeyRelatedField(
+    orders = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True
     )
 
     accounts = serializers.PrimaryKeyRelatedField(
-        many=True,
-        read_only=True
-    )
-
-    orders = serializers.PrimaryKeyRelatedField(
         many=True,
         read_only=True
     )
@@ -26,23 +21,17 @@ class BrokerSerializer(serializers.ModelSerializer):
             'description',
             'type',
             'rate',
-            'deals',
-            'accounts',
             'orders',
+            'accounts',
         )
         read_only_fields = (
             'id',
-            'deals',
-            'accounts',
             'orders',
+            'accounts',
         )
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    deal = serializers.PrimaryKeyRelatedField(
-        read_only=True
-    )
-
     class Meta:
         model = Order
         fields = (
@@ -50,27 +39,12 @@ class OrderSerializer(serializers.ModelSerializer):
             'type',
             'status',
             'currency',
+            'created_at',
+            'description',
             'amount',
             'price',
             'broker',
-            'deal',
-        )
-        read_only_fields = (
-            'id',
-            'deal',
-        )
-
-
-class DealSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Deal
-        fields = (
-            'id',
-            'created_at',
-            'description',
-            'broker',
             'user',
-            'order',
         )
         read_only_fields = (
             'id',
@@ -87,7 +61,9 @@ class AccountSerializer(serializers.ModelSerializer):
             'currency',
             'broker',
             'user',
+            'updated_at',
         )
         read_only_fields = (
             'id',
+            'updated_at',
         )
