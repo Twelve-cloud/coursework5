@@ -30,3 +30,13 @@ def follow_user(user: User, target_user: User) -> None:
         target_user.followers.remove(user)
     else:
         target_user.followers.add(user)
+
+
+def remove_from_followers(user: User, followers: list):
+    """
+    remove_from_followers: remove follower/followers from user's follower list.
+    """
+    followers = User.objects.filter(pk__in=followers)
+    for follower in followers:
+        if follower in user.followers.all():
+            user.followers.remove(follower)

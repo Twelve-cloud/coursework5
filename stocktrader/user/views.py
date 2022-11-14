@@ -3,7 +3,8 @@ from user.permissions import (
     IsNotUserOwner, IsNotUserBanned
 )
 from user.services import (
-    set_blocking, cancel_all_users_orders, follow_user
+    set_blocking, cancel_all_users_orders, follow_user,
+    remove_from_followers
 )
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.shortcuts import get_object_or_404
@@ -99,3 +100,10 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         serializer = self.serializer_class(user.follows.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['patch'])
+    def remove_followers(self, request, pk=None):
+        user = self.get_object()
+        followers_to_remove = request.data.get('followers', [])
+        remove_from_followers(user, followers_to_remove)
+        return Response('Success', status=status.HTTP_200_OK)
