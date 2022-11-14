@@ -26,9 +26,9 @@ class User(AbstractUser):
         verbose_name='Active?'
     )
 
-    follows = models.ForeignKey(
+    follows = models.ManyToManyField(
         'self',
-        on_delete=models.CASCADE,
+        symmetrical=False,
         null=True,
         blank=True,
         related_name='followers',
