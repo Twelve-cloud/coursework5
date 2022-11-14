@@ -15,7 +15,7 @@ class IsUserOwnerOrAdmin(permissions.BasePermission):
             IsUserOwner.has_object_permission(self, request, view, obj)
 
 
-class IsNotAuthentificatedOrAdmin(permissions.BasePermission):
+class IsNotAuthenticatedOrAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
         return not IsAuthenticated.has_permission(self, request, view) or \
             IsAdminUser.has_permission(self, request, view)

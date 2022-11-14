@@ -1,8 +1,9 @@
 from shares.serializers import (
-    BrokerSerializer, OrderSerializer, DealSerializer, AccountSerializer
+    BrokerSerializer, OrderSerializer, AccountSerializer
 )
-from shares.models import Broker, Order, Deal, Account
-from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from shares.models import Broker, Order, Account
+from rest_framework import viewsets, mixins
 
 
 class BrokerViewSet(viewsets.ModelViewSet):
@@ -10,7 +11,8 @@ class BrokerViewSet(viewsets.ModelViewSet):
     serializer_class = BrokerSerializer
     permission_map = {
         'create': (
-            IsNotAuthentificated,
+            IsAuthenticated,
+            IsAdminUser
         ),
         'list': (
             IsAuthenticated,
@@ -20,15 +22,15 @@ class BrokerViewSet(viewsets.ModelViewSet):
         ),
         'update': (
             IsAuthenticated,
-            IsUserOwner,
+            IsAdminUser
         ),
         'partial_update': (
             IsAuthenticated,
-            IsUserOwner,
+            IsAdminUser
         ),
         'destroy': (
             IsAuthenticated,
-            IsUserOwner,
+            IsAdminUser
         )
     }
 
@@ -37,62 +39,31 @@ class BrokerViewSet(viewsets.ModelViewSet):
         return super(self.__class__, self).get_permissions()
 
 
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   viewsets.GenericViewSet):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_map = {
         'create': (
-            IsNotAuthentificated,
+            IsAuthenticated,
         ),
         'list': (
             IsAuthenticated,
+            IsOrderCreator,
+            IsAdminUser,
         ),
         'retrieve': (
             IsAuthenticated,
-        ),
-        'update': (
-            IsAuthenticated,
-            IsUserOwner,
-        ),
-        'partial_update': (
-            IsAuthenticated,
-            IsUserOwner,
+            IsOrderCreator,
+            IsAdminUser,
         ),
         'destroy': (
             IsAuthenticated,
-            IsUserOwner,
-        )
-    }
-
-    def get_permissions(self):
-        self.permission_classes = self.permission_map.get(self.action, [])
-        return super(self.__class__, self).get_permissions()
-
-
-class DealViewSet(viewsets.ModelViewSet):
-    queryset = Deal.objects.all()
-    serializer_class = DealSerializer
-    permission_map = {
-        'create': (
-            IsNotAuthentificated,
-        ),
-        'list': (
-            IsAuthenticated,
-        ),
-        'retrieve': (
-            IsAuthenticated,
-        ),
-        'update': (
-            IsAuthenticated,
-            IsUserOwner,
-        ),
-        'partial_update': (
-            IsAuthenticated,
-            IsUserOwner,
-        ),
-        'destroy': (
-            IsAuthenticated,
-            IsUserOwner,
+            IsOrderCreator,
+            IsAdminUser,
         )
     }
 

@@ -26,6 +26,18 @@ class User(AbstractUser):
         verbose_name='Active?'
     )
 
+    follows = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        verbose_name='Follows'
+    )
+
+    followers = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        verbose_name='Followers'
+    )
+
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'is_active']
 
