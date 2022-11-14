@@ -6,11 +6,11 @@ from user.services import (
     set_blocking, cancel_all_users_orders, follow_user,
     remove_from_followers
 )
+from user.serializers import BasicUserSerializer, FullUserSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from user.serializers import UserSerializer
 from rest_framework import viewsets
 from rest_framework import status
 from user.models import User
@@ -18,7 +18,6 @@ from user.models import User
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
     permission_map = {
         'create': (
             IsNotAuthenticatedOrAdmin,
@@ -65,6 +64,11 @@ class UserViewSet(viewsets.ModelViewSet):
         )
     }
 
+    def get_serializer_class(self):
+        if self.request.user.is_staff:
+            return FullUserSerializer
+        return BasicUserSerializer
+
     def get_permissions(self):
         self.permission_classes = self.permission_map.get(self.action, [])
         return super(self.__class__, self).get_permissions()
@@ -92,13 +96,13 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['get'])
     def followers(self, request, pk=None):
         user = self.get_object()
-        serializer = self.serializer_class(user.followers.all(), many=True)
+        serializer = self.get_serializer_class()(user.followers.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['get'])
     def follows(self, request, pk=None):
         user = self.get_object()
-        serializer = self.serializer_class(user.follows.all(), many=True)
+        serializer = self.get_serializer_class()(user.follows.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])
