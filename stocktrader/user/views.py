@@ -1,4 +1,4 @@
-from user.permissions import IsUserOwner, IsNotAuthentificatedOrAdmin
+from user.permissions import IsUserOwner, IsNotAuthentificated
 from rest_framework.permissions import IsAuthenticated
 from user.serializers import UserSerializer
 from rest_framework import viewsets
@@ -10,7 +10,7 @@ class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_map = {
         'create': (
-            IsNotAuthentificatedOrAdmin,
+            IsNotAuthentificated,
         ),
         'list': (
             IsAuthenticated,
