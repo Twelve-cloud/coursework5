@@ -8,6 +8,8 @@ from user.services import (
 )
 from user.serializers import BasicUserSerializer, FullUserSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -18,6 +20,10 @@ from user.models import User
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['username', 'email', 'first_name', 'last_name']
+    search_fields = ['username', 'email', 'first_name', 'last_name']
+    ordering_fields = ['username', 'email', 'date_joined']
     permission_map = {
         'create': (
             IsNotAuthenticatedOrAdmin,

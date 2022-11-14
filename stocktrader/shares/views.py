@@ -3,6 +3,8 @@ from shares.serializers import (
 )
 from shares.permissions import IsOrderCreatorOrAdmin, IsBalanceOwnerOrAdmin
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.filters import SearchFilter, OrderingFilter
+from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import AnonymousUser
 from shares.models import Broker, Order, Account
 from rest_framework import viewsets, mixins
@@ -11,6 +13,10 @@ from rest_framework import viewsets, mixins
 class BrokerViewSet(viewsets.ModelViewSet):
     queryset = Broker.objects.all()
     serializer_class = BrokerSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['name', 'type']
+    search_fields = ['name', 'type']
+    ordering_fields = ['name', 'type', 'rate']
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -47,6 +53,10 @@ class OrderViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     serializer_class = OrderSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['type', 'status', 'currency', 'amount']
+    search_fields = ['type', 'status', 'currency', 'amount']
+    ordering_fields = ['type', 'status', 'currency', 'created_at', 'amount']
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -81,6 +91,10 @@ class AccountViewSet(mixins.CreateModelMixin,
                      mixins.ListModelMixin,
                      viewsets.GenericViewSet):
     serializer_class = AccountSerializer
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['balance', 'currency']
+    search_fields = ['balance', 'currency']
+    ordering_fields = ['balance', 'currency', 'updated_at']
     permission_map = {
         'create': (
             IsAuthenticated,

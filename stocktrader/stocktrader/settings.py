@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'shares.apps.SharesConfig',
     'jauth.apps.JauthConfig',
     'user.apps.UserConfig',
-    'rest_framework'
+    'rest_framework',
+    'django_filters',
 ]
 
 # -------------------------- MIDDLEWARES --------------------------------------
@@ -148,4 +149,11 @@ JWT_TOKEN = {
     'ALGORITHMS': ['HS256'],
     'SECURE': True,
     'HTTP_ONLY': True,
+}
+
+# -------------------------- DRF SETTINGS -------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
 }
