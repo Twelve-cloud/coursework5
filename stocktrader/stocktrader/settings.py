@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'shares.apps.SharesConfig',
     'jauth.apps.JauthConfig',
     'user.apps.UserConfig',
+    'pyex.apps.PyexConfig',
     'rest_framework',
     'django_filters',
 ]
