@@ -43,9 +43,11 @@ class PyexViewSet(viewsets.GenericViewSet):
     def company_shares(self, request):
         symbol = request.query_params.get('symbol', None)
 
-        if symbol:
+        company_shares = get_company_shares(symbol)
+
+        if company_shares and symbol:
             return Response(
-                data=get_company_shares(symbol),
+                data=company_shares,
                 status=status.HTTP_200_OK
             )
 

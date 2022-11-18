@@ -64,19 +64,24 @@ def get_company_shares(symbol: str) -> dict:
     get_company_shares: returns data about company's shares. Company is chosen
     by symbol.
     """
-    symbol = symbol.lower()
-    shares_data = client.chart(symbol, timeframe='1y')
+    try:
+        symbol = symbol.lower()
+        shares_data = client.chart(symbol, timeframe='1y')
 
-    chart = [
-        {'date': shares['date'], 'close': shares['close']}
-        for shares in shares_data if shares['close']
-    ]
+        chart = [
+            {'date': shares['date'], 'close': shares['close']}
+            for shares in shares_data if shares['close']
+        ]
 
-    last_updated = datetime.now().strftime('%b %-d %Y, %-I:%M %p')
-    latest_price = chart[-1]['close']
+        last_updated = datetime.now().strftime('%b %-d %Y, %-I:%M %p')
+        latest_price = chart[-1]['close']
 
-    return {
-        'chart': chart,
-        'last_updated': last_updated,
-        'latest_price': latest_price
-    }
+    except Exception:
+        return None
+
+    else:
+        return {
+            'chart': chart,
+            'last_updated': last_updated,
+            'latest_price': latest_price
+        }
