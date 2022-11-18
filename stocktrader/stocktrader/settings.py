@@ -158,3 +158,6 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ]
 }
+
+# ----------------------------- PYEX SETTINGS ---------------------------------
+PYEX_KEY = os.getenv('PYEX_KEY')
