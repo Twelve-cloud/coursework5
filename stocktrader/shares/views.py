@@ -11,6 +11,7 @@ from django.contrib.auth.models import AnonymousUser
 from pyex.services import get_stock_latest_price
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
+from shares.apps import update_price
 from rest_framework import status
 
 
@@ -249,6 +250,14 @@ class StockViewSet(mixins.RetrieveModelMixin,
             for account in accounts:
                 shares |= account.shares.all()
             return shares
+
+    def list(self, request, *args, **kwargs):
+        update_price.send(Stock)
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        update_price.send(Stock, pk=kwargs['pk'])
+        return super().retrieve(request, *args, **kwargs)
 
 
 class AccountHistoryViewSet(mixins.RetrieveModelMixin,

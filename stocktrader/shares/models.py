@@ -1,6 +1,6 @@
 from pyex.services import get_stock_latest_price
-from django.db.models.signals import post_save
 from django.dispatch import receiver
+from shares.apps import update_price
 from django.db import models
 
 
@@ -88,6 +88,13 @@ class Order(models.Model):
         related_name='orders'
     )
 
+    class Meta:
+        verbose_name = 'Order'
+        verbose_name_plural = 'Orders'
+        ordering = ('type', 'company', 'amount')
+        db_table = 'Order'
+        get_latest_by = 'created_at'
+
     def __str__(self):
         return f'{self.pk}. {self.broker.name}[{self.get_type_display()}]'
 
@@ -96,18 +103,20 @@ class Order(models.Model):
 
 
 class Account(models.Model):
-    balance = models.FloatField(
+    balance = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
         verbose_name='Balance'
     )
 
-    balance_with_shares = models.FloatField(
-        verbose_name='Balance with shares'
+    balance_with_shares = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Shares balance'
     )
 
     broker = models.ForeignKey(
         'Broker',
-        null=True,
-        blank=True,
         on_delete=models.SET_NULL,
         verbose_name='Broker',
         related_name='accounts'
@@ -124,6 +133,12 @@ class Account(models.Model):
         auto_now=True,
         verbose_name='Updated'
     )
+
+    class Meta:
+        verbose_name = 'Account'
+        verbose_name_plural = 'Accounts'
+        ordering = ('balance', 'balance_with_shares')
+        db_table = 'Account'
 
     def __str__(self):
         return f'{self.pk}. {self.user.username}[{self.balance}]'
@@ -154,6 +169,10 @@ class Stock(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Stock'
+        verbose_name_plural = 'Stocks'
+        ordering = ('company', 'amount', 'current_price')
+        db_table = 'Stock'
         unique_together = ('company', 'account')
 
     def __str__(self):
@@ -162,7 +181,7 @@ class Stock(models.Model):
     def get_absolute_url(self):
         return f'/stocks/{self.pk}/'
 
-    @receiver(post_save)
+    @receiver(update_price)
     def update_current_price(sender, **kwargs):
         stock = sender.objects.get(pk=kwargs['pk'])
         stock.update(current_price=get_stock_latest_price())
@@ -181,13 +200,23 @@ class AccountHistory(models.Model):
         verbose_name='Date'
     )
 
-    balance = models.FloatField(
+    balance = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
         verbose_name='Balance'
     )
 
-    balance_with_shares = models.FloatField(
-        verbose_name='Balance with shares'
+    balance_with_shares = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Shares balance'
     )
+
+    class Meta:
+        verbose_name = 'AccountHistory'
+        verbose_name_plural = 'AccountHistories'
+        ordering = ('balance', 'balance_with_shares')
+        db_table = 'AccountHistory'
 
     def __str__(self):
         return f'history of account #{self.account.pk}'
