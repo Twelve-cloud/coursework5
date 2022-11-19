@@ -19,11 +19,11 @@ from user.models import User
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['username', 'email', 'first_name', 'last_name']
     search_fields = ['username', 'email', 'first_name', 'last_name']
     ordering_fields = ['username', 'email', 'date_joined']
+    queryset = User.objects.all()
     permission_map = {
         'create': (
             IsNotAuthenticatedOrAdmin,
