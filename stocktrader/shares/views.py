@@ -13,6 +13,7 @@ from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from shares.apps import update_price
 from rest_framework import status
+from decimal import Decimal
 
 
 class BrokerViewSet(viewsets.ModelViewSet):
@@ -98,7 +99,6 @@ class OrderViewSet(mixins.CreateModelMixin,
         broker = Broker.objects.get(pk=broker_id)
 
         if type == 'buy':
-            print(amount, account.balance)
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
                 stocks.amount += amount
@@ -107,10 +107,10 @@ class OrderViewSet(mixins.CreateModelMixin,
                 Stock.objects.create(
                     company=company,
                     amount=amount,
-                    purchase_price=latest_price,
+                    current_price=latest_price,
                     account=account
                 )
-            account.balance -= latest_price * amount * float(broker.rate)
+            account.balance -= Decimal(latest_price * amount) * broker.rate
             account.balance_with_shares = account.balance + stocks.current_price * amount
             account.save()
         else:
@@ -124,7 +124,7 @@ class OrderViewSet(mixins.CreateModelMixin,
                     )
                 else:
                     stocks.amount -= amount
-                    account.balance += latest_price * amount * float(broker.rate)
+                    account.balance += Decimal(latest_price * amount) * float(broker.rate)
                     account.balance_with_shares = account.balance + stocks.current_price * amount
                     account.save()
                     stocks.save()

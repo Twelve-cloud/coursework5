@@ -117,7 +117,7 @@ class Account(models.Model):
 
     broker = models.ForeignKey(
         'Broker',
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         verbose_name='Broker',
         related_name='accounts'
     )
@@ -157,7 +157,9 @@ class Stock(models.Model):
         verbose_name='Amount'
     )
 
-    current_price = models.FloatField(
+    current_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
         verbose_name='Current price'
     )
 
@@ -183,7 +185,10 @@ class Stock(models.Model):
 
     @receiver(update_price)
     def update_current_price(sender, **kwargs):
-        stock = sender.objects.get(pk=kwargs['pk'])
+        if 'pk' in kwargs:
+            stock = sender.objects.get(pk=kwargs['pk'])
+        else:
+            stock = sender.objects.all()
         stock.update(current_price=get_stock_latest_price())
 
 

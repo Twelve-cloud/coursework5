@@ -9,4 +9,4 @@ class SharesConfig(AppConfig):
     verbose_name = 'Shares'
 
 
-update_price = Signal(providing_args=['pk'])
+update_price = Signal()
