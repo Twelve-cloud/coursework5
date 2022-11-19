@@ -63,7 +63,10 @@ class PyexViewSet(viewsets.GenericViewSet):
         latest_price = get_stock_latest_price(symbol)
 
         if symbol and latest_price:
-            return Response(data=latest_price, status=status.HTTP_200_OK)
+            return Response(
+                data=latest_price,
+                status=status.HTTP_200_OK
+            )
 
         return Response(
             data='Error: Specify company',
