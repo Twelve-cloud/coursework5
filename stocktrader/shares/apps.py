@@ -1,3 +1,4 @@
+from django.dispatch import Signal
 from django.apps import AppConfig
 
 
@@ -6,3 +7,6 @@ class SharesConfig(AppConfig):
     name = 'shares'
     label = 'shares'
     verbose_name = 'Shares'
+
+
+update_price = Signal()

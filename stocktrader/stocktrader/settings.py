@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'shares.apps.SharesConfig',
     'jauth.apps.JauthConfig',
     'user.apps.UserConfig',
-    'rest_framework'
+    'pyex.apps.PyexConfig',
+    'rest_framework',
+    'django_filters',
 ]
 
 # -------------------------- MIDDLEWARES --------------------------------------
@@ -149,3 +151,13 @@ JWT_TOKEN = {
     'SECURE': True,
     'HTTP_ONLY': True,
 }
+
+# -------------------------- DRF SETTINGS -------------------------------------
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
+}
+
+# ----------------------------- PYEX SETTINGS ---------------------------------
+PYEX_KEY = os.getenv('PYEX_KEY')

@@ -6,7 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 # 2 layer
-RUN apk update && apk add bash postgresql-dev gcc python3-dev musl-dev && pip install poetry
+RUN apk update && apk add bash postgresql-dev gcc g++ python3-dev musl-dev && pip install poetry
 
 WORKDIR /code
 # 3 layer

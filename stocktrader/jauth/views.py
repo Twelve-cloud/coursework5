@@ -38,14 +38,10 @@ class AuthViewSet(viewsets.GenericViewSet):
         set_tokens_to_cookie(response, request.user.id)
 
         return response
-        # If front-end will get 400_BAD_REQUEST
-        # It will remove refresh token from cookie
-        # and request to /auth/jwt/sign_in
-        # without any tokens in a cookie
 
     @action(detail=False, methods=['get'])
     def verify_email(self, request):
-        user_token = request.GET.get('token', None) # change it to query_params from DRF
+        user_token = request.query_params.get('token', None)
         payload = get_payload_by_token(user_token)
 
         if payload is None:
