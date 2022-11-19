@@ -17,12 +17,12 @@ from decimal import Decimal
 
 
 class BrokerViewSet(viewsets.ModelViewSet):
-    queryset = Broker.objects.all()
-    serializer_class = BrokerSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    serializer_class = BrokerSerializer
     filterset_fields = ['name', 'rate']
-    search_fields = ['name', 'rate']
     ordering_fields = ['name', 'rate']
+    search_fields = ['name', 'rate']
+    queryset = Broker.objects.all()
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -59,10 +59,27 @@ class OrderViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    viewsets.GenericViewSet):
     serializer_class = OrderSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['type', 'company', 'amount']
-    search_fields = ['type', 'company', 'amount']
-    ordering_fields = ['type', 'company', 'created_at', 'amount']
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+    ordering_fields = [
+        'type',
+        'company',
+        'created_at',
+        'amount'
+    ]
+    filterset_fields = [
+        'type',
+        'company',
+        'amount'
+    ]
+    search_fields = [
+        'type',
+        'company',
+        'amount'
+    ]
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -91,14 +108,25 @@ class OrderViewSet(mixins.CreateModelMixin,
             return user.orders.all()
 
     def create(self, request, *args, **kwargs):
-        broker_id, user_id = request.data['broker'], request.data['user']
-        type, company = request.data['type'], request.data['company']
+        broker_id, user_id = request.data.get('broker')
+        user_id =  request.data.get('user')
+        type = request.data.get('type')
+        company = request.data.get('company')
         amount = int(request.data['amount'])
         latest_price = get_stock_latest_price(symbol=company)
         account = Account.objects.get(broker=broker_id, user=user_id)
         broker = Broker.objects.get(pk=broker_id)
 
         if type == 'buy':
+            commission = Decimal(latest_price * amount) * broker.rate
+            stocks_price = Decimal(latest_price * amount) + commission
+
+            if account.balance < stocks_price:
+                return Response(
+                    data='Error: Not enough money',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
                 stocks.amount += amount
@@ -110,10 +138,19 @@ class OrderViewSet(mixins.CreateModelMixin,
                     current_price=latest_price,
                     account=account
                 )
+
             stocks = Stock.objects.get(company=company, account=account)
-            account.balance -= Decimal(latest_price * amount) * broker.rate
-            account.balance_with_shares = account.balance + stocks.current_price * amount
+            account.balance -= stocks_price
+            whole_balance = account.balance + stocks.current_price * amount
+            account.balance_with_shares = whole_balance
             account.save()
+
+            AccountViewSet.update(
+                self,
+                request,
+                balance=account.balance,
+                balance_with_shares=account.balance_with_shares
+            )
         else:
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
@@ -125,12 +162,25 @@ class OrderViewSet(mixins.CreateModelMixin,
                     )
                 else:
                     stocks.amount -= amount
-                    account.balance += Decimal(latest_price * amount) * float(broker.rate)
-                    account.balance_with_shares = account.balance + stocks.current_price * amount
-                    account.save()
                     stocks.save()
+
+                    commission = Decimal(latest_price * amount) * broker.rate
+                    stocks_price = Decimal(latest_price * amount) - commission
+
+                    account.balance += stocks_price
+                    whole_balance = account.balance + stocks.current_price * amount
+                    account.balance_with_shares = whole_balance
+                    account.save()
+
                     if not stocks.amount:
                         stocks.delete()
+
+                    AccountViewSet.update(
+                        self,
+                        request,
+                        balance=account.balance,
+                        balance_with_shares=account.balance_with_shares
+                    )
             else:
                 return Response(
                     data='Error: You do not have stocks of this company',
@@ -142,10 +192,24 @@ class OrderViewSet(mixins.CreateModelMixin,
 
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['balance', 'balance_with_shares']
-    search_fields = ['balance', 'balance_with_shares']
-    ordering_fields = ['balance', 'balance_with_shares', 'updated_at']
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+    ordering_fields = [
+        'balance',
+        'balance_with_shares',
+        'updated_at'
+    ]
+    filterset_fields = [
+        'balance',
+        'balance_with_shares'
+    ]
+    search_fields = [
+        'balance',
+        'balance_with_shares'
+    ]
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -188,7 +252,8 @@ class AccountViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        broker_id, user_id = request.data['broker'], request.data['user']
+        broker_id = request.data.get('broker')
+        user_id = request.data.get('user')
 
         if Account.objects.filter(broker=broker_id, user=user_id).exists():
             return Response(
@@ -198,24 +263,38 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         response = super().create(request, *args, **kwargs)
 
+        account = Account.objects.get(broker=broker_id, user=user_id)
+        balance = request.data.get('balance')
+        balance_with_shares = request.data.get('balance_with_shares')
+
         AccountHistory.objects.create(
-            account=Account.objects.get(broker=broker_id, user=user_id),
-            balance=request.data['balance'],
-            balance_with_shares=request.data['balance_with_shares']
+            account=account,
+            balance=balance,
+            balance_with_shares=balance_with_shares
         )
 
         return response
 
     def update(self, request, *args, **kwargs):
-        account = Account.objects.get(pk=kwargs.get('pk'))
+        account = Account.objects.get(
+            pk=kwargs.get('pk'),
+            None
+        )
+
+        balance = request.data.get(
+            'balance',
+            account.balance
+        )
+
+        balance_with_shares = request.data.get(
+            'balance_with_shares',
+            account.balance_with_shares
+        )
 
         AccountHistory.objects.create(
             account=account,
-            balance=request.data.get('balance', account.balance),
-            balance_with_shares=request.data.get(
-                'balance_with_shares',
-                account.balance_with_shares
-            )
+            balance=balance,
+            balance_with_shares=balance_with_shares
         )
 
         return super().update(request, *args, **kwargs)
@@ -226,10 +305,26 @@ class StockViewSet(mixins.RetrieveModelMixin,
                    viewsets.GenericViewSet):
     queryset = Stock.objects.all()
     serializer_class = StockSerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['company', 'amount', 'purchase_price']
-    search_fields = ['company', 'amount', 'purchase_price']
-    ordering_fields = ['company', 'amount', 'purchase_price']
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+    ordering_fields = [
+        'company',
+        'amount',
+        'purchase_price'
+    ]
+    filterset_fields = [
+        'company',
+        'amount',
+        'purchase_price'
+    ]
+    search_fields = [
+        'company',
+        'amount',
+        'purchase_price'
+    ]
     permission_map = {
         'list': (
             IsAuthenticated,
@@ -248,7 +343,7 @@ class StockViewSet(mixins.RetrieveModelMixin,
         accounts = user.accounts.all()
         if accounts:
             shares = accounts[0].shares.all()
-            for account in accounts:
+            for account in accounts[1:]:
                 shares |= account.shares.all()
             return shares
 
@@ -266,10 +361,24 @@ class AccountHistoryViewSet(mixins.RetrieveModelMixin,
                             viewsets.GenericViewSet):
     queryset = AccountHistory.objects.all()
     serializer_class = AccountHistorySerializer
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['balance', 'balance_with_shares']
-    search_fields = ['balance', 'balance_with_shares']
-    ordering_fields = ['balance', 'balance_with_shares', 'date']
+    filter_backends = [
+        DjangoFilterBackend,
+        SearchFilter,
+        OrderingFilter
+    ]
+    ordering_fields = [
+        'balance',
+        'balance_with_shares',
+        'date'
+    ]
+    filterset_fields = [
+        'balance',
+        'balance_with_shares'
+    ]
+    search_fields = [
+        'balance',
+        'balance_with_shares'
+    ]
     permission_map = {
         'list': (
             IsAuthenticated,
@@ -288,6 +397,6 @@ class AccountHistoryViewSet(mixins.RetrieveModelMixin,
         accounts = user.accounts.all()
         if accounts:
             history = accounts[0].history.all()
-            for account in accounts:
+            for account in accounts[1:]:
                 history |= account.history.all()
             return history
