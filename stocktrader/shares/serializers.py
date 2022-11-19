@@ -19,7 +19,6 @@ class BrokerSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'description',
-            'type',
             'rate',
             'orders',
             'accounts',
@@ -87,7 +86,7 @@ class StockSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'company',
-            'amount'
+            'amount',
             'purchase_price',
             'account',
         )

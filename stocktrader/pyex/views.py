@@ -1,6 +1,6 @@
 from pyex.services import (
     get_company_data, get_companies, get_companies_by_symbol,
-    get_company_shares
+    get_company_shares, get_stock_latest_price
 )
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -50,6 +50,20 @@ class PyexViewSet(viewsets.GenericViewSet):
                 data=company_shares,
                 status=status.HTTP_200_OK
             )
+
+        return Response(
+            data='Error: Specify company',
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    @action(detail=False, methods=['get'])
+    def stock_latest_price(self, request):
+        symbol = request.query_params.get('symbol', None)
+
+        latest_price = get_stock_latest_price(symbol)
+
+        if symbol and latest_price:
+            return Response(data=latest_price, status=status.HTTP_200_OK)
 
         return Response(
             data='Error: Specify company',

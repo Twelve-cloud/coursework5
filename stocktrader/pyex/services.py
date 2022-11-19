@@ -85,3 +85,17 @@ def get_company_shares(symbol: str) -> dict:
             'last_updated': last_updated,
             'latest_price': latest_price
         }
+
+
+def get_stock_latest_price(symbol: str) -> dict:
+    """
+    get_stock_latest_price: returns stock's latest price. Company is chosen by
+    symbol.
+    """
+    try:
+        symbol = symbol.lower()
+        result = client.quote(symbol)
+    except Exception:
+        return None
+    else:
+        return result['close']

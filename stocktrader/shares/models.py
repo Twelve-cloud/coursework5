@@ -1,12 +1,10 @@
+from pyex.services import get_stock_latest_price
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.db import models
 
 
 class Broker(models.Model):
-    class Types(models.TextChoices):
-        SPREAD = 'sp', 'Sread'
-        SWAP = 'sw', 'Swap'
-        __empty__ = 'Choose type'
-
     name = models.CharField(
         max_length=64,
         unique=True,
@@ -14,13 +12,9 @@ class Broker(models.Model):
     )
 
     description = models.TextField(
+        blank=True,
+        null=True,
         verbose_name='Description',
-    )
-
-    type = models.CharField(
-        max_length=2,
-        choices=Types.choices,
-        verbose_name='Type'
     )
 
     rate = models.DecimalField(
@@ -28,6 +22,18 @@ class Broker(models.Model):
         decimal_places=3,
         verbose_name='Rate'
     )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Created'
+    )
+
+    class Meta:
+        verbose_name = 'Broker'
+        verbose_name_plural = 'Brokers'
+        ordering = ('name', 'rate')
+        db_table = 'Broker'
+        get_latest_by = 'created_at'
 
     def __str__(self):
         return f'{self.pk}. {self.name}'
@@ -48,12 +54,9 @@ class Order(models.Model):
         verbose_name='Type'
     )
 
-    created_at = models.DateTimeField(
-        auto_now_add=True,
-        verbose_name='Created'
-    )
-
     description = models.TextField(
+        blank=True,
+        null=True,
         verbose_name='Description',
     )
 
@@ -64,6 +67,11 @@ class Order(models.Model):
     company = models.CharField(
         max_length=256,
         verbose_name='Company',
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Created'
     )
 
     broker = models.ForeignKey(
@@ -88,15 +96,11 @@ class Order(models.Model):
 
 
 class Account(models.Model):
-    balance = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    balance = models.FloatField(
         verbose_name='Balance'
     )
 
-    balance_with_shares = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    balance_with_shares = models.FloatField(
         verbose_name='Balance with shares'
     )
 
@@ -138,10 +142,8 @@ class Stock(models.Model):
         verbose_name='Amount'
     )
 
-    purchase_price = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
-        verbose_name='Price'
+    current_price = models.FloatField(
+        verbose_name='Current price'
     )
 
     account = models.ForeignKey(
@@ -151,11 +153,19 @@ class Stock(models.Model):
         related_name='shares'
     )
 
+    class Meta:
+        unique_together = ('company', 'account')
+
     def __str__(self):
         return f'{self.pk}. {self.company}[{self.amount}]'
 
     def get_absolute_url(self):
         return f'/stocks/{self.pk}/'
+
+    @receiver(post_save)
+    def update_current_price(sender, **kwargs):
+        stock = sender.objects.get(pk=kwargs['pk'])
+        stock.update(current_price=get_stock_latest_price())
 
 
 class AccountHistory(models.Model):
@@ -171,15 +181,11 @@ class AccountHistory(models.Model):
         verbose_name='Date'
     )
 
-    balance = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    balance = models.FloatField(
         verbose_name='Balance'
     )
 
-    balance_with_shares = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    balance_with_shares = models.FloatField(
         verbose_name='Balance with shares'
     )
 

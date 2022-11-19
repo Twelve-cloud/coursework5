@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth.models import AnonymousUser
+from pyex.services import get_stock_latest_price
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from rest_framework import status
@@ -17,9 +18,9 @@ class BrokerViewSet(viewsets.ModelViewSet):
     queryset = Broker.objects.all()
     serializer_class = BrokerSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['name', 'type']
-    search_fields = ['name', 'type']
-    ordering_fields = ['name', 'type', 'rate']
+    filterset_fields = ['name', 'rate']
+    search_fields = ['name', 'rate']
+    ordering_fields = ['name', 'rate']
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -87,6 +88,55 @@ class OrderViewSet(mixins.CreateModelMixin,
         else:
             return user.orders.all()
 
+    def create(self, request, *args, **kwargs):
+        broker_id, user_id = request.data['broker'], request.data['user']
+        type, company = request.data['type'], request.data['company']
+        amount = int(request.data['amount'])
+        latest_price = get_stock_latest_price(symbol=company)
+        account = Account.objects.get(broker=broker_id, user=user_id)
+        broker = Broker.objects.get(pk=broker_id)
+
+        if type == 'buy':
+            print(amount, account.balance)
+            if Stock.objects.filter(company=company, account=account).exists():
+                stocks = Stock.objects.get(company=company, account=account)
+                stocks.amount += amount
+                stocks.save()
+            else:
+                Stock.objects.create(
+                    company=company,
+                    amount=amount,
+                    purchase_price=latest_price,
+                    account=account
+                )
+            account.balance -= latest_price * amount * float(broker.rate)
+            account.balance_with_shares = account.balance + stocks.current_price * amount
+            account.save()
+        else:
+            if Stock.objects.filter(company=company, account=account).exists():
+                stocks = Stock.objects.get(company=company, account=account)
+
+                if stocks.amount < amount:
+                    return Response(
+                        data='Error: Stocks to sell must be less than you own',
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                else:
+                    stocks.amount -= amount
+                    account.balance += latest_price * amount * float(broker.rate)
+                    account.balance_with_shares = account.balance + stocks.current_price * amount
+                    account.save()
+                    stocks.save()
+                    if not stocks.amount:
+                        stocks.delete()
+            else:
+                return Response(
+                    data='Error: You do not have stocks of this company',
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+        return super().create(request, *args, **kwargs)
+
 
 class AccountViewSet(viewsets.ModelViewSet):
     serializer_class = AccountSerializer
@@ -136,9 +186,9 @@ class AccountViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        broker, user = request.data['broker'], request.data['user']
+        broker_id, user_id = request.data['broker'], request.data['user']
 
-        if Account.objects.filter(broker=broker, user=user).exists():
+        if Account.objects.filter(broker=broker_id, user=user_id).exists():
             return Response(
                 data='Error: Number of accounts in one broker must be single',
                 status=status.HTTP_400_BAD_REQUEST
@@ -147,7 +197,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         response = super().create(request, *args, **kwargs)
 
         AccountHistory.objects.create(
-            account=Account.objects.get(broker=broker, user=user),
+            account=Account.objects.get(broker=broker_id, user=user_id),
             balance=request.data['balance'],
             balance_with_shares=request.data['balance_with_shares']
         )
