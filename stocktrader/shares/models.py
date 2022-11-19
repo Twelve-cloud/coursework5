@@ -38,37 +38,14 @@ class Broker(models.Model):
 
 class Order(models.Model):
     class Types(models.TextChoices):
-        LIMIT = 'lt', 'Limit'
-        MARKET = 'mt', 'Market'
+        BUY = 'buy', 'Buy'
+        SELL = 'sel', 'Sell'
         __empty__ = 'Choose type'
 
-    class Status(models.TextChoices):
-        PROCCESS = 'pc', 'Process'
-        DONE = 'dn', 'Done'
-        __empty__ = 'Choose status'
-
-    class Currency(models.TextChoices):
-        USD = 'usd', 'Dollar'
-        EUR = 'eur', 'Euro'
-        RUB = 'rub', 'Ruble'
-        __empty__ = 'Choose currency'
-
     type = models.CharField(
-        max_length=2,
+        max_length=3,
         choices=Types.choices,
         verbose_name='Type'
-    )
-
-    status = models.CharField(
-        max_length=2,
-        choices=Status.choices,
-        verbose_name='Status'
-    )
-
-    currency = models.CharField(
-        max_length=3,
-        choices=Currency.choices,
-        verbose_name='Currency'
     )
 
     created_at = models.DateTimeField(
@@ -88,6 +65,11 @@ class Order(models.Model):
         max_digits=8,
         decimal_places=3,
         verbose_name='Price'
+    )
+
+    company = models.CharField(
+        max_length=256,
+        verbose_name='Company',
     )
 
     broker = models.ForeignKey(
@@ -112,22 +94,16 @@ class Order(models.Model):
 
 
 class Account(models.Model):
-    class Currency(models.TextChoices):
-        USD = 'usd', 'Dollar'
-        EUR = 'eur', 'Euro'
-        RUB = 'rub', 'Ruble'
-        __empty__ = 'Choose currency'
-
     balance = models.DecimalField(
         max_digits=8,
         decimal_places=3,
         verbose_name='Balance'
     )
 
-    currency = models.CharField(
-        max_length=3,
-        choices=Currency.choices,
-        verbose_name='Currency'
+    balance_with_shares = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Balance with shares'
     )
 
     broker = models.ForeignKey(
@@ -156,3 +132,65 @@ class Account(models.Model):
 
     def get_absolute_url(self):
         return f'/accounts/{self.pk}/'
+
+
+class Stock(models.Model):
+    company = models.CharField(
+        max_digits=256,
+        verbose_name='Company'
+    )
+
+    amount = models.IntegerField(
+        verbose_name='Amount'
+    )
+
+    purchase_price = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Price'
+    )
+
+    account = models.ForeignKey(
+        'Account',
+        on_delete=models.CASCADE,
+        verbose_name='Account',
+        related_name='shares'
+    )
+
+    def __str__(self):
+        return f'{self.pk}. {self.company}[{self.amount}]'
+
+    def get_absolute_url(self):
+        return f'/stocks/{self.pk}/'
+
+
+class AccountHistory(models.Model):
+    account = models.ForeignKey(
+        'Account',
+        on_delete=models.CASCADE,
+        verbose_name='Account',
+        related_name='history'
+    )
+
+    date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='Date'
+    )
+
+    balance = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Balance'
+    )
+
+    balance_with_shares = models.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        verbose_name='Balance with shares'
+    )
+
+    def __str__(self):
+        return f'history of account #{self.account.pk}'
+
+    def get_absolute_url(self):
+        return f'/history/{self.pk}/'

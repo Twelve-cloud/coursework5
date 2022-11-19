@@ -54,9 +54,9 @@ class OrderViewSet(mixins.CreateModelMixin,
                    viewsets.GenericViewSet):
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['type', 'status', 'currency', 'amount']
-    search_fields = ['type', 'status', 'currency', 'amount']
-    ordering_fields = ['type', 'status', 'currency', 'created_at', 'amount']
+    filterset_fields = ['type', 'company', 'amount', 'price']
+    search_fields = ['type', 'company', 'amount', 'price']
+    ordering_fields = ['type', 'company', 'created_at', 'amount', 'price']
     permission_map = {
         'create': (
             IsAuthenticated,
@@ -92,9 +92,9 @@ class AccountViewSet(mixins.CreateModelMixin,
                      viewsets.GenericViewSet):
     serializer_class = AccountSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['balance', 'currency']
-    search_fields = ['balance', 'currency']
-    ordering_fields = ['balance', 'currency', 'updated_at']
+    filterset_fields = ['balance', 'balance_with_shares']
+    search_fields = ['balance', 'balance_with_shares']
+    ordering_fields = ['balance', 'balance_with_shares', 'updated_at']
     permission_map = {
         'create': (
             IsAuthenticated,
