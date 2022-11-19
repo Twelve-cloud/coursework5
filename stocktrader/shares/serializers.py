@@ -40,7 +40,6 @@ class OrderSerializer(serializers.ModelSerializer):
             'created_at',
             'description',
             'amount',
-            'price',
             'company',
             'broker',
             'user',
@@ -67,7 +66,7 @@ class AccountSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'balance',
-            'balance_with_shares'
+            'balance_with_shares',
             'broker',
             'user',
             'updated_at',
@@ -78,7 +77,7 @@ class AccountSerializer(serializers.ModelSerializer):
             'id',
             'updated_at',
             'shares',
-            'history'
+            'history',
         )
 
 

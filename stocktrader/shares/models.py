@@ -61,12 +61,6 @@ class Order(models.Model):
         verbose_name='Amount'
     )
 
-    price = models.DecimalField(
-        max_digits=8,
-        decimal_places=3,
-        verbose_name='Price'
-    )
-
     company = models.CharField(
         max_length=256,
         verbose_name='Company',
@@ -136,7 +130,7 @@ class Account(models.Model):
 
 class Stock(models.Model):
     company = models.CharField(
-        max_digits=256,
+        max_length=256,
         verbose_name='Company'
     )
 
