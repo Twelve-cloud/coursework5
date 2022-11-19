@@ -87,7 +87,7 @@ class StockSerializer(serializers.ModelSerializer):
             'id',
             'company',
             'amount',
-            'purchase_price',
+            'current_price',
             'account',
         )
         read_only_fields = (

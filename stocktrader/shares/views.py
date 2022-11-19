@@ -108,8 +108,8 @@ class OrderViewSet(mixins.CreateModelMixin,
             return user.orders.all()
 
     def create(self, request, *args, **kwargs):
-        broker_id, user_id = request.data.get('broker')
-        user_id =  request.data.get('user')
+        broker_id = request.data.get('broker')
+        user_id = request.data.get('user')
         type = request.data.get('type')
         company = request.data.get('company')
         amount = int(request.data['amount'])
@@ -145,12 +145,6 @@ class OrderViewSet(mixins.CreateModelMixin,
             account.balance_with_shares = whole_balance
             account.save()
 
-            AccountViewSet.update(
-                self,
-                request,
-                balance=account.balance,
-                balance_with_shares=account.balance_with_shares
-            )
         else:
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
@@ -175,17 +169,17 @@ class OrderViewSet(mixins.CreateModelMixin,
                     if not stocks.amount:
                         stocks.delete()
 
-                    AccountViewSet.update(
-                        self,
-                        request,
-                        balance=account.balance,
-                        balance_with_shares=account.balance_with_shares
-                    )
             else:
                 return Response(
                     data='Error: You do not have stocks of this company',
                     status=status.HTTP_400_BAD_REQUEST
                 )
+
+        AccountHistory.objects.create(
+            account=account,
+            balance=account.balance,
+            balance_with_shares=account.balance_with_shares
+        )
 
         return super().create(request, *args, **kwargs)
 
@@ -277,8 +271,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         account = Account.objects.get(
-            pk=kwargs.get('pk'),
-            None
+            pk=kwargs.get('pk')
         )
 
         balance = request.data.get(
@@ -299,6 +292,30 @@ class AccountViewSet(viewsets.ModelViewSet):
 
         return super().update(request, *args, **kwargs)
 
+    def list(self, request, *args, **kwargs):
+        for account in Account.objects.all():
+            shares_cost = sum(
+                [
+                    get_stock_latest_price(stock.company) * stock.amount
+                    for stock in account.shares.all()
+                ]
+            )
+            account.balance_with_shares = account.balance + Decimal(shares_cost)
+            account.save()
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        account = Account.objects.get(pk=kwargs['pk'])
+        shares_cost = sum(
+            [
+                get_stock_latest_price(stock.company) * stock.amount
+                for stock in account.shares.all()
+            ]
+        )
+        account.balance_with_shares = account.balance + Decimal(shares_cost)
+        account.save()
+        return super().retrieve(request, *args, **kwargs)
+
 
 class StockViewSet(mixins.RetrieveModelMixin,
                    mixins.ListModelMixin,
@@ -313,17 +330,17 @@ class StockViewSet(mixins.RetrieveModelMixin,
     ordering_fields = [
         'company',
         'amount',
-        'purchase_price'
+        'current_price'
     ]
     filterset_fields = [
         'company',
         'amount',
-        'purchase_price'
+        'current_price'
     ]
     search_fields = [
         'company',
         'amount',
-        'purchase_price'
+        'current_price'
     ]
     permission_map = {
         'list': (

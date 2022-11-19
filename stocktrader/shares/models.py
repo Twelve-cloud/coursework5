@@ -1,7 +1,6 @@
 from pyex.services import get_stock_latest_price
 from django.dispatch import receiver
 from shares.apps import update_price
-from django.db.models import F
 from django.db import models
 
 
@@ -188,9 +187,12 @@ class Stock(models.Model):
     def update_current_price(sender, **kwargs):
         if 'pk' in kwargs:
             stock = sender.objects.get(pk=kwargs['pk'])
+            stock.current_price = get_stock_latest_price(stock.company)
+            stock.save()
         else:
-            stock = sender.objects.all()
-        stock.update(current_price=get_stock_latest_price(F('company')))
+            for stock in sender.objects.all():
+                stock.current_price = get_stock_latest_price(stock.company)
+                stock.save()
 
 
 class AccountHistory(models.Model):
