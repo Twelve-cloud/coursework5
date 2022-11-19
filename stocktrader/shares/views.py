@@ -110,6 +110,7 @@ class OrderViewSet(mixins.CreateModelMixin,
                     current_price=latest_price,
                     account=account
                 )
+            stocks = Stock.objects.get(company=company, account=account)
             account.balance -= Decimal(latest_price * amount) * broker.rate
             account.balance_with_shares = account.balance + stocks.current_price * amount
             account.save()

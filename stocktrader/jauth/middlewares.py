@@ -21,10 +21,6 @@ class JWTMiddleware:
 
             if request.user.is_blocked:
                 raise PermissionDenied(detail='User is blocked')
-                # If front-end will get HTTP_401_UNAUTHORIZED
-                # It'll delete access token from cookie and
-                # set refresh token to a cookie and request to
-                # /auth/jwt/refresh to get new tokens
 
         response = self.next(request)
         return response
