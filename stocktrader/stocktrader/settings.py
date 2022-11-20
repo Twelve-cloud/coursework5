@@ -161,3 +161,20 @@ REST_FRAMEWORK = {
 
 # ----------------------------- PYEX SETTINGS ---------------------------------
 PYEX_KEY = os.getenv('PYEX_KEY')
+
+# -------------------------- RABBITMQ SETTINGS --------------------------------
+RABBITMQ = {
+    'PROTOCOL': os.getenv('RABBITMQ_PROTOCOL'),
+    'HOST': os.getenv('RABBITMQ_HOST'),
+    'PORT': os.getenv('RABBITMQ_PORT'),
+    'USER': os.getenv('RABBITMQ_USER'),
+    'PASSWORD': os.getenv('RABBITMQ_PASSWORD'),
+}
+
+# ------------------------- CELERY SETTINGS -----------------------------------
+CELERY_BROKER_URL = (
+    f"{RABBITMQ['PROTOCOL']}://{RABBITMQ['USER']}:"
+    f"{RABBITMQ['PASSWORD']}@{RABBITMQ['HOST']}:{RABBITMQ['PORT']}"
+)
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
