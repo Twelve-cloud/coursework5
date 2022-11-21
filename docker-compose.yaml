@@ -21,3 +21,22 @@ services:
       - ./stocktrader/postgres/database:/var/lib/postgresql/data
     env_file:
       - ./stocktrader/.env
+
+
+  rabbitmq:
+      image: rabbitmq:3-management-alpine
+      container_name: rabbitmq
+      ports:
+        - 5672:5672
+        - 15672:15672
+
+  celery:
+      build: ./stocktrader
+      container_name: celery
+      entrypoint:
+        - ./celery-entrypoint.sh
+      env_file:
+        - ./stocktrader/.env
+      depends_on:
+        - rabbitmq
+        - db
