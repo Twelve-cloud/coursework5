@@ -184,12 +184,12 @@ CELERY_BEAT_SCHEDULE = {
     'add-every-midnight':
     {
         'task': 'stocktrader.tasks.clear_database_from_waste_accounts',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab(minute=0, hour='*/3')
     },
     'update-every-month':
     {
         'task': 'stocktrader.tasks.update_users_balance',
-        'schedule': crontab(minute='*/1')
+        'schedule': crontab(0, 0, day_of_month='1')
     }
 }
 
