@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -161,3 +162,46 @@ REST_FRAMEWORK = {
 
 # ----------------------------- PYEX SETTINGS ---------------------------------
 PYEX_KEY = os.getenv('PYEX_KEY')
+
+# -------------------------- RABBITMQ SETTINGS --------------------------------
+RABBITMQ = {
+    'PROTOCOL': os.getenv('RABBITMQ_PROTOCOL'),
+    'HOST': os.getenv('RABBITMQ_HOST'),
+    'PORT': os.getenv('RABBITMQ_PORT'),
+    'USER': os.getenv('RABBITMQ_USER'),
+    'PASSWORD': os.getenv('RABBITMQ_PASSWORD'),
+}
+
+# ------------------------- CELERY SETTINGS -----------------------------------
+CELERY_BROKER_URL = (
+    f"{RABBITMQ['PROTOCOL']}://{RABBITMQ['USER']}:"
+    f"{RABBITMQ['PASSWORD']}@{RABBITMQ['HOST']}:{RABBITMQ['PORT']}"
+)
+
+CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+CELERY_BEAT_SCHEDULE = {
+    'add-every-midnight':
+    {
+        'task': 'stocktrader.tasks.clear_database_from_waste_accounts',
+        'schedule': crontab(minute=0, hour='*/3')
+    },
+    'update-every-month':
+    {
+        'task': 'stocktrader.tasks.update_users_balance',
+        'schedule': crontab(0, 0, day_of_month='1')
+    }
+}
+
+CELERY_ENABLE_UTC = True
+
+CELERY_TIMEZONE = 'UTC'
+
+# ----------------------- DJANGO EMAIL SETTINGS -------------------------------
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')

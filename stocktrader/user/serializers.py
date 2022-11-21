@@ -37,7 +37,7 @@ class BasicUserSerializer(serializers.ModelSerializer):
         )
 
     def create(self, validated_data):
-        validated_data['is_active'] = True  # delete it after notification link will be sent
+        validated_data['is_active'] = False
         return self.Meta.model.objects.create_user(**validated_data)
 
     def update(self, instance, validated_data):

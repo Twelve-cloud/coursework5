@@ -22,5 +22,5 @@ COPY . /code
 # everytime when we add new files to out directory.
 
 # 6 layer
-RUN chmod +x django-entrypoint.sh
+RUN chmod +x django-entrypoint.sh && chmod +x celery-entrypoint.sh && chmod +x celerybeat-entrypoint.sh
 EXPOSE 8000

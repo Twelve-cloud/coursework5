@@ -6,9 +6,10 @@ from shares.permissions import IsOrderCreatorOrAdmin, IsBalanceOwnerOrAdmin
 from shares.models import Broker, Order, Account, Stock, AccountHistory
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
+from pyex.services import get_stock_latest_price, get_companies
 from django_filters.rest_framework import DjangoFilterBackend
+from stocktrader.tasks import send_notification_about_order
 from django.contrib.auth.models import AnonymousUser
-from pyex.services import get_stock_latest_price
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from shares.apps import update_price
@@ -116,6 +117,7 @@ class OrderViewSet(mixins.CreateModelMixin,
         latest_price = get_stock_latest_price(symbol=company)
         account = Account.objects.get(broker=broker_id, user=user_id)
         broker = Broker.objects.get(pk=broker_id)
+        company_name = get_companies()[company.upper()]
 
         if type == 'buy':
             commission = Decimal(latest_price * amount) * broker.rate
@@ -145,6 +147,13 @@ class OrderViewSet(mixins.CreateModelMixin,
             account.balance_with_shares = whole_balance
             account.save()
 
+            send_notification_about_order.delay(
+                'buy',
+                amount,
+                account.user.email,
+                company_name
+            )
+
         else:
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
@@ -168,6 +177,13 @@ class OrderViewSet(mixins.CreateModelMixin,
 
                     if not stocks.amount:
                         stocks.delete()
+
+                    send_notification_about_order.delay(
+                        'sell',
+                        amount,
+                        account.user.email,
+                        company_name
+                    )
 
             else:
                 return Response(

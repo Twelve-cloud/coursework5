@@ -4,17 +4,19 @@ from user.permissions import (
 )
 from user.services import (
     set_blocking, cancel_all_users_orders, follow_user,
-    remove_from_followers
+    remove_from_followers, send_verification_link
 )
 from user.serializers import BasicUserSerializer, FullUserSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework import status
+from django.urls import reverse
 from user.models import User
 
 
@@ -84,6 +86,11 @@ class UserViewSet(viewsets.ModelViewSet):
         obj = get_object_or_404(queryset, pk=self.kwargs['pk'])
         self.check_object_permissions(self.request, obj)
         return obj
+
+    def create(self, request, *args, **kwargs):
+        link = request.build_absolute_uri(reverse('jwt-verify-email'))
+        send_verification_link(link, request.data['email'])
+        return super().create(request, *args, **kwargs)
 
     @action(detail=True, methods=['patch'])
     def block(self, request, pk=None):
