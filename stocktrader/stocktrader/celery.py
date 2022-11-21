@@ -15,6 +15,11 @@ app.conf.beat_schedule = {
         'task': 'stocktrader.tasks.clear_database_from_waste_accounts',
         'schedule': crontab(minute=0, hour=0),
     },
+    'update-every-month':
+    {
+        'task': 'stocktrader.tasks.update_users_balance',
+        'schedule': crontab(minute='*/3')
+    }
 }
 
 app.autodiscover_tasks()

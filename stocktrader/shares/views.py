@@ -7,6 +7,7 @@ from shares.models import Broker, Order, Account, Stock, AccountHistory
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
+from stocktrader.tasks import send_notification_about_order
 from django.contrib.auth.models import AnonymousUser
 from pyex.services import get_stock_latest_price
 from rest_framework.response import Response
@@ -145,6 +146,8 @@ class OrderViewSet(mixins.CreateModelMixin,
             account.balance_with_shares = whole_balance
             account.save()
 
+            send_notification_about_order.delay('buy', amount, account.user.email)
+
         else:
             if Stock.objects.filter(company=company, account=account).exists():
                 stocks = Stock.objects.get(company=company, account=account)
@@ -168,6 +171,8 @@ class OrderViewSet(mixins.CreateModelMixin,
 
                     if not stocks.amount:
                         stocks.delete()
+
+                    send_notification_about_order.delay('sell', amount, account.user.email)
 
             else:
                 return Response(

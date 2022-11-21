@@ -1,3 +1,5 @@
+from stocktrader.tasks import send_email_to_verify_account
+from jauth.services import generate_token
 from user.models import User
 
 
@@ -40,3 +42,11 @@ def remove_from_followers(user: User, followers: list):
     for follower in followers:
         if follower in user.followers.all():
             user.followers.remove(follower)
+
+
+def send_verification_link(link: str, email: str) -> None:
+    """
+    send_verification_link: send verification link to user email.
+    """
+    verify_url = link + '?token=' + generate_token(type='access', user_id=email)
+    send_email_to_verify_account.delay(email, verify_url)

@@ -178,3 +178,12 @@ CELERY_BROKER_URL = (
 )
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+# ----------------------- DJANGO EMAIL SETTINGS -------------------------------
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
