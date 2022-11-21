@@ -40,3 +40,14 @@ services:
       depends_on:
         - rabbitmq
         - db
+
+  celerybeat:
+      build: ./stocktrader
+      container_name: celerybeat
+      entrypoint:
+        - ./celerybeat-entrypoint.sh
+      env_file:
+        - ./stocktrader/.env
+      depends_on:
+        - rabbitmq
+        - db

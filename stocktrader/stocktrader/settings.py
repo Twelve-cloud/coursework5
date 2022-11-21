@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from pathlib import Path
 import os
@@ -178,6 +179,23 @@ CELERY_BROKER_URL = (
 )
 
 CELERY_BROKER_TRANSPORT_OPTIONS = {'visibility_timeout': 3600}
+
+CELERY_BEAT_SCHEDULE = {
+    'add-every-midnight':
+    {
+        'task': 'stocktrader.tasks.clear_database_from_waste_accounts',
+        'schedule': crontab(minute='*/1'),
+    },
+    'update-every-month':
+    {
+        'task': 'stocktrader.tasks.update_users_balance',
+        'schedule': crontab(minute='*/1')
+    }
+}
+
+CELERY_ENABLE_UTC = True
+
+CELERY_TIMEZONE = 'UTC'
 
 # ----------------------- DJANGO EMAIL SETTINGS -------------------------------
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
