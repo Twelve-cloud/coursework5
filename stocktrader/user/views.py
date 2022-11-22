@@ -3,14 +3,12 @@ from user.permissions import (
     IsNotUserOwner, IsNotUserBanned
 )
 from user.services import (
-    set_blocking, cancel_all_users_orders, follow_user,
-    remove_from_followers, send_verification_link
+    set_blocking, follow_user, remove_from_followers, send_verification_link
 )
 from user.serializers import BasicUserSerializer, FullUserSerializer
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django_filters.rest_framework import DjangoFilterBackend
-from django.contrib.auth.models import AnonymousUser
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -97,7 +95,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user = self.get_object()
         is_blocked = request.data.get('is_blocked', False)
         set_blocking(user, is_blocked)
-        cancel_all_users_orders(user)
         return Response('Success', status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['patch'])

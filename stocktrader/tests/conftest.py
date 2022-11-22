@@ -33,8 +33,3 @@ def admin():
 @pytest.fixture()
 def blocked_user():
     return baker.make(User, is_staff=False, is_blocked=True)
-
-
-@pytest.fixture()
-def users():
-    return [baker.make(User, is_staff=False) for i in range(10)]

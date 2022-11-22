@@ -6,29 +6,19 @@ import pytest
 
 @pytest.fixture()
 def user_json():
-    user = baker.prepare(User, role='u')
+    user = baker.prepare(User, is_staff=False)
     return {
         'email': user.email,
         'username': user.username,
         'password': user.password,
-        'role': user.role
-    }
-
-
-@pytest.fixture()
-def admin_json():
-    admin = baker.prepare(User, role='a')
-    return {
-        'email': admin.email,
-        'username': admin.username,
-        'password': admin.password,
-        'role': admin.role
+        'is_staff': user.is_staff
     }
 
 
 @pytest.fixture()
 def update_json():
     return {
+        'password': '12341234',
         'first_name': 'James',
         'last_name': 'Bond'
     }
