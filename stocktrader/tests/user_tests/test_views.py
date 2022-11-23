@@ -55,14 +55,31 @@ class TestUserViewSet:
         assert user.is_blocked is True
         assert response.status_code == status.HTTP_200_OK
 
-    def test_follow(self, api_factory, user, admin):
-        pass
+    def test_follow(self, api_factory, user, admin, userperm):
+        request = api_factory.patch('', '', format='json')
+        user.is_active = True
+        request.user = user
+        response = follow_view(request, pk=admin.pk)
+        assert (user in admin.followers.all()) is True
+        assert response.status_code == status.HTTP_200_OK
 
-    def test_followers(self, api_factory, user, admin):
-        pass
+    def test_followers(self, api_factory, user, userperm):
+        request = api_factory.get('', {}, format='json')
+        user.is_active = True
+        request.user = user
+        response = followers_view(request, pk=user.pk)
+        assert response.status_code == status.HTTP_200_OK
 
-    def test_follows(self):
-        pass
+    def test_follows(self, api_factory, user, userperm):
+        request = api_factory.get('', {}, format='json')
+        user.is_active = True
+        request.user = user
+        response = follows_view(request, pk=user.pk)
+        assert response.status_code == status.HTTP_200_OK
 
-    def test_remove_followers(self):
-        pass
+    def test_remove_followers(self, api_factory, user, userperm):
+        request = api_factory.patch('', {}, format='json')
+        user.is_active = True
+        request.user = user
+        response = remove_followers_view(request, pk=user.pk)
+        assert response.status_code == status.HTTP_200_OK
