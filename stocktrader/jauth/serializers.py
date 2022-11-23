@@ -42,11 +42,6 @@ class SignInSerializer(serializers.Serializer):
                 'This user has been blocked.'
             )
 
-        if not user.is_active:
-            raise serializers.ValidationError(
-                'This user is not found.'
-            )
-
         return {
             'id': user.id,
             'email': user.email,

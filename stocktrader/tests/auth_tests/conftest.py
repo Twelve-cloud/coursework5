@@ -26,18 +26,7 @@ def refresh_data():
 
 @pytest.fixture()
 def blocked_user_json():
-    user = baker.prepare(User, is_staff=False, is_blocked=True)
-    user.set_password('12341234')
-    user.save()
-    return {
-        'email': user.email,
-        'password': '12341234'
-    }
-
-
-@pytest.fixture()
-def unverif_user_json():
-    user = baker.prepare(User, is_staff=False, is_active=False)
+    user = baker.prepare(User, is_staff=False, is_blocked=True, is_active=True)
     user.set_password('12341234')
     user.save()
     return {
@@ -53,8 +42,7 @@ def user_json():
     user.save()
     return {
         'email': user.email,
-        'password': '12341234',
-        'is_active': user.is_active
+        'password': '12341234'
     }
 
 
