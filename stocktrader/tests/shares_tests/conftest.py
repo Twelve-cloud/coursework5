@@ -1,4 +1,5 @@
 from shares.models import Broker, Order, Stock, AccountHistory
+from shares.views import StockViewSet
 from model_bakery import baker
 import pytest
 
@@ -26,3 +27,10 @@ def stock():
 @pytest.fixture()
 def account_history(account):
     return baker.make(AccountHistory, account=account)
+
+
+@pytest.fixture()
+def stockperm(mocker):
+    mock = mocker.MagicMock(return_value=True)
+    mocker.patch.object(StockViewSet, 'check_permissions', mock)
+    mocker.patch.object(StockViewSet, 'check_object_permissions', mock)
