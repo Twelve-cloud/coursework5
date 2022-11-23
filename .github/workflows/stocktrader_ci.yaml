@@ -1,0 +1,32 @@
+name: CI
+
+on: [push]
+
+env:
+  PYEX_KEY: ${{ secrets.PYEX_KEY }}
+
+jobs:
+  test:
+    runs-on: [ubuntu-latest]
+
+    steps:
+      - name: clone github repository
+        uses: actions/checkout@master
+
+      - name: install python3.10
+        uses: actions/setup-python@v1
+        with:
+          python-version: '3.10'
+          architecture: 'x64'
+
+      - name: install poetry
+        run: pip install poetry
+
+      - name: create venv and install stocktrader-core-app dependencies
+        run: cd stocktrader && poetry install
+
+      - name: run tests for stocktrader-core-app
+        run: cd stocktrader && poetry run pytest --cov=.
+
+      - name: run linter for stocktrader-core-app
+        run: cd stocktrader && poetry run flake8 .
