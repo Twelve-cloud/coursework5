@@ -34,7 +34,7 @@ const Team = () => {
       flex: 1,
       renderCell: ({ id }) => {
         return (
-          <Button onClick={() => onCreateClick(id)} sx={{ backgroundColor: colors.greenAccent[600] }}>Create account</Button>
+          <Button onClick={() => onCreateClick(id)}>Create account</Button>
         );
       },
     },

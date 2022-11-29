@@ -15,12 +15,6 @@ const Stocks = () => {
     const columns = [
         { field: "id", headerName: "ID" },
         {
-            field: "broker",
-            headerName: "Broker",
-            flex: 1,
-            cellClassName: "name-column--cell",
-        },
-        {
             field: "company",
             headerName: "Company",
             flex: 1,
@@ -31,24 +25,10 @@ const Stocks = () => {
             flex: 1,
         },
         {
-            field: "type",
-            headerName: "Type",
+            field: "current_price",
+            headerName: "Current Price",
             flex: 1,
-            renderCell: (params) => (
-                <Typography color={colors.greenAccent[500]}>
-                    {params.value}
-                </Typography>
-            ),
-        },
-        {
-            field: "description",
-            headerName: "Description",
-            flex: 1,
-        },
-        {
-            field: "created_at",
-            headerName: "Created At",
-            flex: 1,
+            cellClassName: "name-column--cell",
         },
     ];
 

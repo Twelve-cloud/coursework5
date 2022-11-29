@@ -98,4 +98,4 @@ def get_stock_latest_price(symbol: str) -> dict:
     except Exception:
         return None
     else:
-        return result['close']
+        return result['latestPrice']

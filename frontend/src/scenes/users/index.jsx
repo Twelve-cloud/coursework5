@@ -6,6 +6,7 @@ import Header from "../../components/Header";
 import { useTheme } from "@mui/material";
 import { useEffect, useState } from "react";
 import { authApi } from "../../api/authApi";
+import Button from '@mui/material/Button';
 
 const Contacts = () => {
   const theme = useTheme();
@@ -18,12 +19,18 @@ const Contacts = () => {
     async function fetchMyAPI() {
       try {
         const users = await authApi.getUsers();
-        const modifiedUsers = users.map((user) => ({
-          ...user,
-          first_name: user.first_name || "-",
-          last_name: user.last_name || "-",
-          date_joined: new Date(user.date_joined).toLocaleString()
-        }))
+        const currentUserFollows = users.filter(user => user.id == localStorage.getItem("user_id"))[0].follows;
+
+        const modifiedUsers = users.map((user) => {
+          return {
+            ...user,
+            first_name: user.first_name || "-",
+            last_name: user.last_name || "-",
+            is_follow: currentUserFollows.map((follow) => user.id === follow)[0],
+            date_joined: new Date(user.date_joined).toLocaleString()
+          }
+        })
+
         setUsers(modifiedUsers)
       } catch (error) {
         console.log(error)
@@ -34,6 +41,26 @@ const Contacts = () => {
 
     fetchMyAPI()
   }, [])
+
+  const onBtnClick = async (id) => {
+    try {
+      await authApi.followUser(id);
+      let user = users.filter(user => user.id === id)[0];
+      user = {
+        ...user,
+        is_follow: !user.is_follow
+      }
+
+      const newUsers = users.filter(function (item) {
+        return item.id !== user.id
+      })
+
+      setUsers([...newUsers, user])
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },
@@ -66,6 +93,22 @@ const Contacts = () => {
       field: "is_staff",
       headerName: "Is Staff",
       flex: 1,
+    },
+    {
+      field: "",
+      headerName: "Follow/Unfollow",
+      flex: 1,
+      renderCell: (params) => {
+
+        return (
+          <Button
+            onClick={() => onBtnClick(params.id)}
+            color={params.row.is_follow ? "error" : "success"}
+            size="large"
+            variant="contained">
+            {params.row.is_follow ? "Unfollow" : "Follow"}
+          </Button >)
+      },
     },
   ];
 

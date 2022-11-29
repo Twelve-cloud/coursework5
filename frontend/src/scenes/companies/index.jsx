@@ -1,17 +1,17 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import { Box, useTheme } from "@mui/material";
+import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
-import { mockDataInvoices } from "../../data/mockData";
 import Header from "../../components/Header";
 import { useState } from "react";
 import { useEffect } from "react";
 import { authApi } from "../../api/authApi";
-import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from "react-router-dom";
 
 const Companies = () => {
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     const [companies, setCompanies] = useState([]);
+    const navigate = useNavigate();
 
     const columns = [
         { field: "id", headerName: "ID" },
@@ -74,9 +74,17 @@ const Companies = () => {
                     "& .MuiCheckbox-root": {
                         color: `${colors.greenAccent[200]} !important`,
                     },
+                    "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
+                        color: `${colors.grey[100]} !important`,
+                    },
                 }}
             >
-                <DataGrid onRowClick={(params) => console.log(params.id)} sx={{ cursor: "pointer" }} rows={companies} columns={columns} />
+                <DataGrid
+                    onRowClick={(params) => navigate(`${params.id}`)}
+                    sx={{ cursor: "pointer" }}
+                    rows={companies}
+                    columns={columns}
+                    components={{ Toolbar: GridToolbar }} />
             </Box>
         </Box>
     );

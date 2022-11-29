@@ -3,9 +3,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
 import Sidebar from "./scenes/global/Sidebar";
 import Dashboard from "./scenes/dashboard";
-import Team from "./scenes/team";
+import Team from "./scenes/brokers";
 import Invoices from "./scenes/invoices";
-import Contacts from "./scenes/contacts";
+import Contacts from "./scenes/users";
 import Bar from "./scenes/bar";
 import Form from "./scenes/form";
 import Line from "./scenes/line";
@@ -20,6 +20,7 @@ import SignUpForm from "./scenes/auth/SignUpForm"
 import Orders from "./scenes/orders";
 import Stocks from "./scenes/stocks";
 import Companies from "./scenes/companies";
+import Company from "./scenes/companies/Company";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -58,6 +59,7 @@ function App() {
               <Route path="/stocks" element={<Stocks />} />
               <Route path="/contacts" element={<Contacts />} />
               <Route path="/companies" element={<Companies />} />
+              <Route exact path="/companies/:companyId" element={<Company />} />
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/form" element={<Form />} />

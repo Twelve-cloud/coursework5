@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import { mockDataInvoices } from "../../data/mockData";
@@ -15,34 +15,25 @@ const Invoices = () => {
   const columns = [
     { field: "id", headerName: "ID" },
     {
-      field: "name",
-      headerName: "Name",
+      field: "broker",
+      headerName: "Broker",
+      flex: 1,
+    },
+    {
+      field: "balance",
+      headerName: "Balance",
       flex: 1,
       cellClassName: "name-column--cell",
     },
     {
-      field: "phone",
-      headerName: "Phone Number",
+      field: "balance_with_shares",
+      headerName: "Balance With Shares",
       flex: 1,
+      cellClassName: "name-column--cell",
     },
     {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-    },
-    {
-      field: "cost",
-      headerName: "Cost",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography color={colors.greenAccent[500]}>
-          ${params.row.cost}
-        </Typography>
-      ),
-    },
-    {
-      field: "date",
-      headerName: "Date",
+      field: "updated_at",
+      headerName: "Updated Date",
       flex: 1,
     },
   ];
@@ -51,12 +42,14 @@ const Invoices = () => {
     async function fetchMyAPI() {
       try {
         const balances = await authApi.getBalances()
-        // const modified = brokers.map((broker) => ({
-        //   ...broker,
-        //   description: broker.description || "-",
-        // }))
-        console.log(balances)
-        setBalances(balances)
+        const modified = balances.map((balance) => ({
+          ...balance,
+          balance: balance.balance + "$",
+          balance_with_shares: balance.balance_with_shares + "$",
+          updated_at: new Date(balance.updated_at).toLocaleString(),
+        }))
+
+        setBalances(modified)
       } catch (error) {
         console.log(error)
       }
@@ -97,7 +90,7 @@ const Invoices = () => {
           },
         }}
       >
-        <DataGrid rows={mockDataInvoices} columns={columns} />
+        <DataGrid rows={balances} columns={columns} />
       </Box>
     </Box>
   );

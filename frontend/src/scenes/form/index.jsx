@@ -64,8 +64,6 @@ const Form = () => {
     return <div>Loading...</div>
   }
 
-  console.log(user)
-
   return (
     <Box m="20px">
       <Header title="EDIT USER" subtitle="Edit User Profile" />
@@ -153,19 +151,6 @@ const Form = () => {
                 disabled={true}
                 error={!!touched.username && !!errors.username}
                 helperText={touched.username && errors.username}
-                sx={{ gridColumn: "span 4" }}
-              />
-              <TextField
-                fullWidth
-                variant="filled"
-                type="password"
-                label="Password"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                value={values.password}
-                name="password"
-                error={!!touched.password && !!errors.password}
-                helperText={touched.password && errors.password}
                 sx={{ gridColumn: "span 4" }}
               />
               <TextField

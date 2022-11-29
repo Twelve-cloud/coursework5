@@ -37,4 +37,5 @@ export const requests = {
         axios.put(url, body, { withCredentials: true }).then(sleep(delayValue)).then(responseBody),
     delete: (url) =>
         axios.delete(url, { withCredentials: true }).then(sleep(delayValue)).then(responseBody),
+    patch: (url, body) => axios.patch(url, body, { withCredentials: true }).then(sleep(delayValue)).then(responseBody)
 };
