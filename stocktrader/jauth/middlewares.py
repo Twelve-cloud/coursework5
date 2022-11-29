@@ -9,7 +9,7 @@ class JWTMiddleware:
         self.next = next
 
     def __call__(self, request):
-        access_token = request.COOKIES.get('access_token', None)
+        access_token = request.headers.get('Authorization', None)
 
         if access_token:
             payload = get_payload_by_token(access_token)
