@@ -39,4 +39,4 @@ class TestAuthViews:
         get_payload = mocker.MagicMock(return_value={'sub': user.email})
         mocker.patch('jauth.views.get_payload_by_token', get_payload)
         response = verify_email_view(request)
-        assert response.status_code == status.HTTP_200_OK
+        assert response.status_code == status.HTTP_302_FOUND

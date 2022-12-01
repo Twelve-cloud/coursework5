@@ -13,9 +13,9 @@ class TestMiddleware:
         with pytest.raises(AuthenticationFailed):
             middleware(_request)
 
-        _request.COOKIES = {'access_token': access_token_of_blocked_user}
+        _request.headers = {'Authorization': access_token_of_blocked_user}
         with pytest.raises(PermissionDenied):
             middleware(_request)
 
-        _request.COOKIES = {'access_token': access_token}
+        _request.headers = {'Authorization': access_token}
         assert middleware(_request) is None
