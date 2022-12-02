@@ -17,5 +17,8 @@ export const authApi = {
     getCompanyDataById: (id) => requests.get(`/pyex/data/company_data?symbol=${id}`),
     getCompanySharesById: (id) => requests.get(`/pyex/data/company_shares?symbol=${id}`),
     getBalancesHistory: (account) => requests.get(`/shares/accounts-history?account=${account}`),
-    followUser: (id) => requests.patch(`/user/users/${id}/follow/`)
+    followUser: (id) => requests.patch(`/user/users/${id}/follow/`),
+    getFollowers: () => requests.get("/user/users/followers/"),
+    getFollows: () => requests.get("/user/users/follows/"),
+    removeAllFollowers: (values) => requests.patch("/user/users/remove_followers/", values)
 }

@@ -56,7 +56,6 @@ const Contacts = () => {
       })
 
       setUsers([...newUsers, user])
-
     } catch (error) {
       console.log(error)
     }

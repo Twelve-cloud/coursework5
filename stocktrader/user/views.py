@@ -103,21 +103,21 @@ class UserViewSet(viewsets.ModelViewSet):
         follow_user(request.user, target_user)
         return Response('Success', status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
     def followers(self, request, pk=None):
-        user = self.get_object()
+        user = request.user
         serializer = self.get_serializer_class()(user.followers.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['get'])
+    @action(detail=False, methods=['get'])
     def follows(self, request, pk=None):
-        user = self.get_object()
+        user = request.user
         serializer = self.get_serializer_class()(user.follows.all(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(detail=True, methods=['patch'])
+    @action(detail=False, methods=['patch'])
     def remove_followers(self, request, pk=None):
-        user = self.get_object()
+        user = request.user
         followers_to_remove = request.data.get('followers', [])
         remove_from_followers(user, followers_to_remove)
         return Response('Success', status=status.HTTP_200_OK)

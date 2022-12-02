@@ -1,4 +1,4 @@
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect } from "react";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -8,18 +8,16 @@ import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
-import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined";
-import BarChartOutlinedIcon from "@mui/icons-material/BarChartOutlined";
-import PieChartOutlineOutlinedIcon from "@mui/icons-material/PieChartOutlineOutlined";
 import TimelineOutlinedIcon from "@mui/icons-material/TimelineOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import MapOutlinedIcon from "@mui/icons-material/MapOutlined";
-import { Routes, Route, useLocation } from "react-router-dom";
 import ShowChartIcon from '@mui/icons-material/ShowChart';
 import { authApi } from "../../api/authApi";
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import SwitchAccountIcon from '@mui/icons-material/SwitchAccount';
+import AccessibleForwardIcon from '@mui/icons-material/AccessibleForward';
+import Skeleton from '@mui/material/Skeleton';
 
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -39,29 +37,11 @@ const Item = ({ title, to, icon, selected, setSelected }) => {
   );
 };
 
-const Sidebar = ({ show }) => {
+const Sidebar = ({ show, user, loadingUser }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const [user, setUser] = useState({
-    username: "",
-    email: ""
-  });
-
-  useEffect(() => {
-    async function fetchMyAPI() {
-      try {
-
-        const user = await authApi.getUserById(localStorage.getItem("user_id"));
-        setUser(user);
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchMyAPI()
-  }, [])
 
   return (
     <Box
@@ -124,17 +104,34 @@ const Sidebar = ({ show }) => {
                 />
               </Box>
               <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  color={colors.grey[100]}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
-                >
-                  {user.username}
-                </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  {user.email}
-                </Typography>
+                {loadingUser ? <>
+                  <Skeleton style={{
+                    width: "30%",
+                    height: "45px",
+                    margin: "0 auto",
+
+                  }} />
+                  <Skeleton style={{
+                    width: "60%",
+                    height: "35px",
+                    margin: "0 auto",
+                    marginBottom: "10px"
+                  }} />
+                </> : <>
+                  <Typography
+                    variant="h2"
+                    color={colors.grey[100]}
+                    fontWeight="bold"
+                    sx={{ m: "10px 0 0 0" }}
+                  >
+                    {user.username}
+                  </Typography>
+                  <Typography variant="h5" color={colors.greenAccent[500]}>
+                    {user.email}
+                  </Typography>
+                </>
+                }
+
               </Box>
             </Box>
           )}
@@ -162,7 +159,20 @@ const Sidebar = ({ show }) => {
               selected={selected}
               setSelected={setSelected}
             />
-
+            <Item
+              title="Followers"
+              to="/followers"
+              icon={<SwitchAccountIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Follows"
+              to="/follows"
+              icon={<AccessibleForwardIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
             <Typography
               variant="h6"
               color={colors.grey[300]}

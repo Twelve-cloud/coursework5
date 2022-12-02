@@ -21,12 +21,22 @@ import Orders from "./scenes/orders";
 import Stocks from "./scenes/stocks";
 import Companies from "./scenes/companies";
 import Company from "./scenes/companies/Company";
+import Followers from "./scenes/followers";
+import { Follows } from "./scenes/follows";
+import "react-pro-sidebar/dist/css/styles.css";
+import { authApi } from "./api/authApi";
 
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const [showTopbar, setShowTopbar] = useState(true);
   const [showSidebar, setShowSidebar] = useState(true);
+  const [user, setUser] = useState({
+    username: "",
+    email: ""
+  });
+  const [loadingUser, setLoadingUser] = useState(false)
+
   const location = useLocation();
 
   useLayoutEffect(() => {
@@ -41,6 +51,20 @@ function App() {
     } else {
       setShowSidebar(true)
     }
+
+    async function fetchMyAPI() {
+      setLoadingUser(true)
+      try {
+        const user = await authApi.getUserById(localStorage.getItem("user_id"));
+        setUser(user);
+      } catch (error) {
+        console.log(error)
+      } finally {
+        setLoadingUser(false)
+      }
+    }
+
+    fetchMyAPI()
   }, [location.pathname]);
 
   return (
@@ -48,7 +72,7 @@ function App() {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <div className="app">
-          <Sidebar show={showSidebar} isSidebar={isSidebar} />
+          <Sidebar show={showSidebar} isSidebar={isSidebar} user={user} loadingUser={loadingUser} />
           <main className="content">
             <Topbar show={showTopbar} setIsSidebar={setIsSidebar} />
             <Routes>
@@ -67,6 +91,8 @@ function App() {
               <Route path="/pie" element={<Pie />} />
               <Route path="/line" element={<Line />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/followers" element={<Followers />} />
+              <Route path="/follows" element={<Follows />} />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/geography" element={<Geography />} />
             </Routes>
