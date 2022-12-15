@@ -96,7 +96,7 @@ export const Followers = () => {
                 variant="contained"
                 onClick={onBtnClick}
             >
-                Remove all followers
+                Remove followers
             </Button >
             <Box
                 m="40px 0 0 0"

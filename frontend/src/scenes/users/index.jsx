@@ -19,7 +19,7 @@ const Contacts = () => {
     async function fetchMyAPI() {
       try {
         const users = await authApi.getUsers();
-        const currentUserFollows = users.filter(user => user.id == localStorage.getItem("user_id"))[0].follows;
+        const currentUserFollows = users.filter(user => user.id === localStorage.getItem("user_id"))[0].follows;
 
         const modifiedUsers = users.map((user) => {
           return {
