@@ -250,10 +250,7 @@ class AccountViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if not isinstance(user, AnonymousUser) and user.is_staff is True:
-            return Account.objects.all()
-        else:
-            return user.accounts.all()
+        return user.accounts.all()
 
     def create(self, request, *args, **kwargs):
         if len(request.user.accounts.all()) == 3:
@@ -309,7 +306,7 @@ class AccountViewSet(viewsets.ModelViewSet):
         return super().update(request, *args, **kwargs)
 
     def list(self, request, *args, **kwargs):
-        for account in Account.objects.all():
+        for account in self.get_queryset():
             shares_cost = sum(
                 [
                     get_stock_latest_price(stock.company) * stock.amount

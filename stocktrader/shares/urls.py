@@ -2,6 +2,8 @@ from rest_framework.routers import DefaultRouter
 from shares import views
 
 
+app_name = 'shares'
+
 router = DefaultRouter()
 
 router.register(

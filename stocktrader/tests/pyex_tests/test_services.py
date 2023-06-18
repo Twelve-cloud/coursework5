@@ -42,7 +42,7 @@ class TestPyexServices:
         assert get_company_shares(None) is None
 
     def test_get_stock_latest_price(self, mocker):
-        quote = mocker.MagicMock(return_value={'close': '150'})
+        quote = mocker.MagicMock(return_value={'latestPrice': '150'})
         mocker.patch.object(client, 'quote', quote)
         result = get_stock_latest_price('aapl')
         quote.assert_called_once()

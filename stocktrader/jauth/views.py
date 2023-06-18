@@ -1,9 +1,10 @@
 from jauth.services import (
-    set_tokens_to_cookie, get_payload_by_token, verify_user
+    set_tokens_to_cookie, get_payload_by_token, verify_user, generate_token
 )
 from jauth.serializers import SignInSerializer
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from django.shortcuts import redirect
 from rest_framework import viewsets
 from rest_framework import status
 from user.models import User
@@ -16,6 +17,11 @@ class AuthViewSet(viewsets.GenericViewSet):
         serializer.is_valid(raise_exception=True)
         response = Response(serializer.data, status=status.HTTP_200_OK)
         set_tokens_to_cookie(response, serializer.validated_data['id'])
+        access_token = generate_token(type='access', user_id=serializer.validated_data['id'])
+        refresh_token = generate_token(type='refresh', user_id=serializer.validated_data['id'])
+        response.data['access_token'] = access_token
+        response.data['refresh_token'] = refresh_token
+        response.data['user_id'] = serializer.validated_data['id']
         return response
 
     @action(detail=False, methods=['get'])
@@ -53,4 +59,4 @@ class AuthViewSet(viewsets.GenericViewSet):
         email = payload.get('sub')
         verify_user(email)
 
-        return Response(data={'Verification': 'OK'}, status=status.HTTP_200_OK)
+        return redirect('http://localhost:5000/sign-in')

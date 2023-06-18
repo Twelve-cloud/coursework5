@@ -51,3 +51,15 @@ services:
       depends_on:
         - rabbitmq
         - db
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    entrypoint:
+      - ./entrypoint.sh
+    volumes:
+      - .:/frontend/app
+    ports:
+      - 5000:5000
+    depends_on:
+      - web

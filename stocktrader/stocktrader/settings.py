@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'pyex.apps.PyexConfig',
     'rest_framework',
     'django_filters',
+    'corsheaders',
 ]
 
 # -------------------------- MIDDLEWARES --------------------------------------
@@ -55,6 +56,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -146,7 +148,7 @@ AUTH_USER_MODEL = 'user.User'
 
 # --------------------------- JWT SETTINGS ------------------------------------
 JWT_TOKEN = {
-    'ACCESS_TOKEN_LIFETIME_MINUTES': 15,
+    'ACCESS_TOKEN_LIFETIME_MINUTES': 15 * 4 * 24,
     'REFRESH_TOKEN_LIFETIME_DAYS': 30,
     'ALGORITHMS': ['HS256'],
     'SECURE': True,
@@ -205,3 +207,19 @@ EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+
+# --------------------- CORS SETTINGS -----------------------------------------
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:5000',
+    'http://127.0.0.1:5000'
+]
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+    'http://localhost:5000',
+    'http://127.0.0.1:5000'
+]
+
+CORS_ALLOW_CREDENTIALS = True

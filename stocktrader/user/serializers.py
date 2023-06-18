@@ -26,14 +26,16 @@ class BasicUserSerializer(serializers.ModelSerializer):
             'orders',
             'accounts',
             'follows',
-            'followers'
+            'followers',
+            'date_joined',
         )
         read_only_fields = (
             'id',
             'orders',
             'accounts',
             'follows',
-            'followers'
+            'followers',
+            'date_joined',
         )
 
     def create(self, validated_data):
