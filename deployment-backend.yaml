@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-backend
+  namespace: deploy
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: backend-django
+  template:
+    metadata:
+      name: backend-pod
+      labels:
+        app: backend-django
+    spec:
+      containers:
+      - image: twelvecloud/coursework5:backend
+        imagePullPolicy: Always
+        command: ["./django-entrypoint.sh"]
+        name: backend
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /api/v1/admin/
+            port: 8000
+          initialDelaySeconds: 60
+        readinessProbe:
+          periodSeconds: 1
+          httpGet:
+            path: /api/v1/admin/
+            port: 8000
+        envFrom:
+        - secretRef:
+            name: secret-backend
+        - prefix: CONFIG_
+          configMapRef:
+            name: configmap-backend
+      restartPolicy: Always

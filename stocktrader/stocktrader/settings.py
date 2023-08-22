@@ -12,22 +12,18 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 
 from celery.schedules import crontab
-from dotenv import load_dotenv
 from pathlib import Path
+import dns.resolver
 import os
 
-
-load_dotenv()
-
 # -------------------------- MAIN SETTINGS ------------------------------------
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
-DEBUG = os.getenv('DEBUG')
+DEBUG = os.getenv('CONFIG_DEBUG')
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost').split(',')
+ALLOWED_HOSTS = os.getenv('CONFIG_ALLOWED_HOSTS', 'localhost').split(',')
 
 ROOT_URLCONF = 'stocktrader.urls'
 
@@ -84,19 +80,31 @@ TEMPLATES = [
 ]
 
 # ---------------------------- DATABASES --------------------------------------
+srv_records = dns.resolver.query('service-database-headless.deploy.svc.cluster.local', 'SRV')
+master_host = srv_records[0].target
 
 DATABASES = {
-    'default': {
+    'master': {
         'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
         'NAME': os.getenv('POSTGRES_DB', 'StockTrader'),
-        'HOST': os.getenv('POSTGRES_HOST'),
+        'HOST': master_host,
         'PORT': os.getenv('POSTGRES_PORT'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'CONN_MAX_AGE': int(os.getenv('CONN_MAX_AGE', '0')),
+        'CONN_MAX_AGE': int(os.getenv('CONFIG_CONN_MAX_AGE', '0')),
+    },
+    'default': {
+        'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('POSTGRES_DB', 'StockTrader'),
+        'HOST': os.getenv('SERVICE_DATABASE_PUBLIC_SERVICE_HOST'),
+        'PORT': os.getenv('SERVICE_DATABASE_PUBLIC_SERVICE_PORT'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'CONN_MAX_AGE': int(os.getenv('CONFIG_CONN_MAX_AGE', '0')),
     }
 }
 
+DATABASE_ROUTERS = ['stocktrader.dbrouters.DbRouter']
 # ------------------------- LANGUAGE SETTINGS ---------------------------------
 
 LANGUAGE_CODE = 'en-us'
@@ -168,8 +176,8 @@ PYEX_KEY = os.getenv('PYEX_KEY')
 # -------------------------- RABBITMQ SETTINGS --------------------------------
 RABBITMQ = {
     'PROTOCOL': os.getenv('RABBITMQ_PROTOCOL'),
-    'HOST': os.getenv('RABBITMQ_HOST'),
-    'PORT': os.getenv('RABBITMQ_PORT'),
+    'HOST': os.getenv('SERVICE_RABBITMQ_SERVICE_HOST'),
+    'PORT': os.getenv('SERVICE_RABBITMQ_SERVICE_PORT'),
     'USER': os.getenv('RABBITMQ_USER'),
     'PASSWORD': os.getenv('RABBITMQ_PASSWORD'),
 }
