@@ -59,6 +59,9 @@ jobs:
       - name: create migrations
         run: kubectl create -f job-migrations.yaml
 
+      - name: migrations?
+        run: while : do kubectl describe job job-migrations -n deploy; done
+
       - name: wait migrations
         run: kubectl wait --for=condition=complete job/job-migrations --timeout=-30s -n deploy
 
