@@ -29,8 +29,17 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@master
 
-      - name: run minikube
-        run: make run
+      - name: create database headless service
+        run: kubectl create -f service-database-headless.yaml
+
+      - name: create database public service
+        run: kubectl create -f service-database-public.yaml
+
+      - name: create database
+        run: kubectl create -f statefulset-database.yaml
+
+      - name: wait database
+        run: kubectl rollout status statefulset statefulset-database -n deploy
 
       - name: run tests for stocktrader-core-app
         run: cd stocktrader && poetry run pytest --cov=.
