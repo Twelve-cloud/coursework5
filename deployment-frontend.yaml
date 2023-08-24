@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-frontend
+  namespace: deploy
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: frontend-react
+  template:
+    metadata:
+      name: frontend-pod
+      labels:
+        app: frontend-react
+    spec:
+      serviceAccountName: service-account-deploy
+      containers:
+      - image: twelvecloud/coursework5:frontend
+        imagePullPolicy: Always
+        command: ["./entrypoint.sh"]
+        name: frontend
+        ports:
+        - containerPort: 5000
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 5000
+          initialDelaySeconds: 60
+        readinessProbe:
+          periodSeconds: 1
+          httpGet:
+            path: /
+            port: 5000
+      restartPolicy: Always

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-celery
+  namespace: deploy
+spec:
+  replicas: 3
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  minReadySeconds: 10
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: backend-celery
+  template:
+    metadata:
+      name: celery-pod
+      labels:
+        app: backend-celery
+    spec:
+      serviceAccountName: service-account-deploy
+      containers:
+      - image: twelvecloud/coursework5:backend
+        imagePullPolicy: Always
+        command: ["./celery-entrypoint.sh"]
+        name: celery
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        envFrom:
+        - secretRef:
+            name: secret-backend
+        - prefix: CONFIG_
+          configMapRef:
+            name: configmap-backend
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 200m
+            memory: 800Mi
+      - image: twelvecloud/coursework5:backend
+        imagePullPolicy: Always
+        command: ["./celerybeat-entrypoint.sh"]
+        name: celerybeat
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        envFrom:
+        - secretRef:
+            name: secret-backend
+        - prefix: CONFIG_
+          configMapRef:
+            name: configmap-backend
+      restartPolicy: Always

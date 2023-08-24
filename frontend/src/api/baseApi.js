@@ -4,7 +4,7 @@ import Cookies from 'js-cookie';
 const delayValue = 1000;
 const csrftoken = Cookies.get('csrftoken');
 
-axios.defaults.baseURL = "http://localhost:8000/api/v1";
+axios.defaults.baseURL = `http://${process.env.SERVICE_BACKEND_SERVICE_HOST}:${process.env.SERVICE_BACKEND_SERVICE_PORT}/api/v1`;
 if (csrftoken) axios.defaults.headers.common['x-csrftoken'] = csrftoken
 
 
