@@ -56,17 +56,23 @@ jobs:
       - name: wait database
         run: kubectl rollout status statefulset statefulset-database -n deploy
 
+      - name: create migrations
+        run: kubectl create -f job-migrations.yaml
+
+      - name: wait migrations
+        run: kubectl wait --for=condition=complete job/job-migrations --timeout=-30s -n deploy
+
       - name: give access to database replication script
         run: chmod +x postgres-replication.sh
 
       - name: set up database replication
         run: ./postgres-replication.sh
 
-      - name: test
-        run: kubectl run -it srvlookup --image=tutum/dnsutils --rm  --restart=Never -- dig SRV service-database-headless.deploy.svc.cluster.local
-
       - name: run tests for stocktrader-core-app
-        run: cd stocktrader && poetry run pytest --cov=.
+        run: kubectl create -f job-test.yaml
+
+      - name: wait tests
+        run: kubectl wait --for=condition=complete job/job-test --timeout=-30s -n deploy
 
       - name: run linter for stocktrader-core-app
         run: cd stocktrader && poetry run flake8 .
