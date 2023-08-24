@@ -4,10 +4,9 @@ metadata:
   name: service-backend
   namespace: deploy
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   ports:
   - port: 80
     targetPort: 8000
-    nodePort: 30007
   selector:
     app: backend-django

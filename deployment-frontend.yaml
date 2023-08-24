@@ -15,12 +15,12 @@ spec:
     matchLabels:
       app: frontend-react
   template:
-    serviceAccountName: service-account-deploy
     metadata:
       name: frontend-pod
       labels:
         app: frontend-react
     spec:
+      serviceAccountName: service-account-deploy
       containers:
       - image: twelvecloud/coursework5:frontend
         imagePullPolicy: Always

@@ -68,7 +68,8 @@ create:
 	kubectl create -f hpa-celery.yaml
 	while ! kubectl get hpa hpa-backend -n deploy &> /dev/null; do echo "Waiting for hpa-backend. CTRL-C to exit."; sleep 1; done
 
-
+	kubectl create -f deployment-frontend.yaml
+	kubectl rollout status deployment deployment-frontend -n deploy
 
 start:
 	minikube start

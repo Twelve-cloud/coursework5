@@ -25,6 +25,15 @@ jobs:
       - name: create venv and install stocktrader-core-app dependencies
         run: cd stocktrader && poetry install
 
+      - name: install minikube
+        run: install minikube
+
+      - name: install make
+        run: install make
+
+      - name: run minikube
+        run: make create
+
       - name: run tests for stocktrader-core-app
         run: cd stocktrader && poetry run pytest --cov=.
 
