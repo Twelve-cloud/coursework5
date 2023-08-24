@@ -29,6 +29,12 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@master
 
+      - name: create namespace
+        run: kubectl create -f namespace.yaml
+
+      - name: create service account
+        run: kubectl create -f service-account-deploy.yaml
+
       - name: create database headless service
         run: kubectl create -f service-database-headless.yaml
 
