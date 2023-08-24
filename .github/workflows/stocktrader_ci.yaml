@@ -35,6 +35,12 @@ jobs:
       - name: create service account
         run: kubectl create -f service-account-deploy.yaml
 
+      - name: create secret
+        run: kubectl create -f secret-backend.yaml
+
+      - name: create configmap
+        run: kubectl create -f configmap-backend.yaml
+
       - name: create database headless service
         run: kubectl create -f service-database-headless.yaml
 
@@ -46,6 +52,12 @@ jobs:
 
       - name: wait database
         run: kubectl rollout status statefulset statefulset-database -n deploy
+
+      - name: give access to database replication script
+        run: chmod +x postgres-replication.sh
+
+      - name: set up database replication
+        run: ./postgres-replication.sh
 
       - name: run tests for stocktrader-core-app
         run: cd stocktrader && poetry run pytest --cov=.
