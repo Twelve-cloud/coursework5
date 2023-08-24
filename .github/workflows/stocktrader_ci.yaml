@@ -60,7 +60,7 @@ jobs:
         run: kubectl create -f job-migrations.yaml
 
       - name: migrations?
-        run:while ! kubectl describe job job-migrations -n deploy; do echo "Waiting for service-rabbitmq. CTRL-C to exit."; sleep 1; done
+        run: while ! kubectl describe job job-migrations -n deploy; do echo "Waiting for service-rabbitmq. CTRL-C to exit."; sleep 1; done
 
       - name: wait migrations
         run: kubectl wait --for=condition=complete job/job-migrations --timeout=-30s -n deploy
