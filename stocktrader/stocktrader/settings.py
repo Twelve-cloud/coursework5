@@ -85,8 +85,8 @@ master_host = srv_records[0].target
 
 DATABASES = {
     'master': {
-        'ENGINE': os.getenv('POSTGRES_ENGINE', 'django.db.backends.sqlite3'),
-        'NAME': os.getenv('POSTGRES_DB', 'StockTrader'),
+        'ENGINE': os.getenv('POSTGRES_ENGINE'),
+        'NAME': os.getenv('POSTGRES_DB'),
         'HOST': master_host,
         'PORT': os.getenv('POSTGRES_PORT'),
         'USER': os.getenv('POSTGRES_USER'),
