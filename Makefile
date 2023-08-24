@@ -2,9 +2,7 @@ test:
 	cd stocktrader && poetry run pytest
 	cd stocktrader && flake8 .
 
-create:
-	minikube start
-
+run:
 	kubectl create -f namespace.yaml
 	kubectl wait --for jsonpath='{.status.phase}=Active' namespace/deploy --timeout=60s
 
@@ -76,7 +74,6 @@ start:
 
 stop:
 	minikube stop
-
 
 delete:
 	minikube delete
