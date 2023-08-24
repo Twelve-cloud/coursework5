@@ -15,6 +15,7 @@ spec:
     matchLabels:
       app: frontend-react
   template:
+    serviceAccountName: service-account-deploy
     metadata:
       name: frontend-pod
       labels:

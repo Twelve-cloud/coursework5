@@ -20,6 +20,7 @@ spec:
       labels:
         app: backend-django
     spec:
+      serviceAccountName: service-account-deploy
       containers:
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
@@ -44,4 +45,11 @@ spec:
         - prefix: CONFIG_
           configMapRef:
             name: configmap-backend
+        resources:
+          requests:
+            cpu: 400m
+            memory: 200Mi
+          limits:
+            cpu: 600m
+            memory: 300Mi
       restartPolicy: Always

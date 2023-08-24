@@ -8,6 +8,15 @@ create:
 	kubectl create -f namespace.yaml
 	kubectl wait --for jsonpath='{.status.phase}=Active' namespace/deploy --timeout=60s
 
+	kubectl create -f service-account-deploy.yaml
+	while ! kubectl get serviceaccount service-account-deploy -n deploy &> /dev/null; do echo "Waiting for service account. CTRL-C to exit."; sleep 1; done
+
+	kubectl create -f resource-quota-deploy.yaml
+	while ! kubectl get quota resource-quota-deploy -n deploy &> /dev/null; do echo "Waiting for resource qouta. CTRL-C to exit."; sleep 1; done
+
+	kubectl create -f limit-range-deploy.yaml
+	while ! kubectl get limits limit-range-deploy -n deploy &> /dev/null; do echo "Waiting for limit range. CTRL-C to exit."; sleep 1; done
+
 	kubectl create -f secret-backend.yaml
 	while ! kubectl get secret secret-backend -n deploy &> /dev/null; do echo "Waiting for secret-backend. CTRL-C to exit."; sleep 1; done
 
@@ -48,6 +57,17 @@ create:
 	kubectl create -f deployment-celery.yaml
 	kubectl rollout status deployment deployment-backend -n deploy
 	kubectl rollout status deployment deployment-celery -n deploy
+
+	minikube addons enable metrics-server
+	kubectl rollout status deployment metrics-server -n kube-system
+	while ! kubectl top pod --all-namespaces &> /dev/null; do echo "Waiting for collecting metrics. CTRL-C to exit."; sleep 1; done
+
+	kubectl create -f hpa-backend.yaml
+	while ! kubectl get hpa hpa-backend -n deploy &> /dev/null; do echo "Waiting for hpa-backend. CTRL-C to exit."; sleep 1; done
+
+	kubectl create -f hpa-celery.yaml
+	while ! kubectl get hpa hpa-backend -n deploy &> /dev/null; do echo "Waiting for hpa-backend. CTRL-C to exit."; sleep 1; done
+
 
 
 start:

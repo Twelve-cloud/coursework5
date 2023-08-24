@@ -10,6 +10,7 @@ spec:
       labels:
         app: migrations-backend
     spec:
+      serviceAccountName: service-account-deploy
       containers:
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
@@ -24,4 +25,11 @@ spec:
         - prefix: CONFIG_
           configMapRef:
             name: configmap-backend
+        resources:
+          requests:
+            cpu: 700m
+            memory: 500Mi
+          limits:
+            cpu: 1
+            memory: 800Mi
       restartPolicy: OnFailure

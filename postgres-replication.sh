@@ -9,8 +9,7 @@ pg_ctl restart -D /var/lib/postgresql/data
 EOF
 sleep 10 && kubectl wait --for=condition=Ready pod/statefulset-database-0 -n deploy --timeout=-30s
 kubectl exec -i statefulset-database-0 -n deploy -- bash << EOF
-pg_dumpall --database=postgres --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --globals-only --no-privileges | psql -U Twelve StockTrader
-Annieleo1!
+PGPASSWORD=Annieleo1! pg_dumpall --database=postgres --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --globals-only --no-privileges | psql -U Twelve StockTrader
 exit
 EOF
 
@@ -22,8 +21,7 @@ pg_ctl restart -D /var/lib/postgresql/data
 EOF
 sleep 10 && kubectl wait --for=condition=Ready pod/statefulset-database-1 -n deploy --timeout=-30s
 kubectl exec -i statefulset-database-1 -n deploy -- bash << EOF
-pg_dump --dbname=StockTrader --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --create --schema-only | psql -U Twelve StockTrader
-Annieleo1!
+PGPASSWORD=Annieleo1! pg_dump --dbname=StockTrader --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --create --schema-only | psql -U Twelve StockTrader
 exit
 EOF
 
@@ -36,8 +34,7 @@ pg_ctl restart -D /var/lib/postgresql/data
 EOF
 sleep 10 && kubectl wait --for=condition=Ready pod/statefulset-database-2 -n deploy --timeout=-30s
 kubectl exec -i statefulset-database-2 -n deploy -- bash << EOF
-pg_dump --dbname=StockTrader --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --create --schema-only | psql -U Twelve StockTrader
-Annieleo1!
+PGPASSWORD=Annieleo1! pg_dump --dbname=StockTrader --host=statefulset-database-0.service-database-headless.deploy.svc.cluster.local --username=Twelve --create --schema-only | psql -U Twelve StockTrader
 exit
 EOF
 

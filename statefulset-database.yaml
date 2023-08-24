@@ -16,6 +16,7 @@ spec:
       labels:
         app: database-postgres
     spec:
+      serviceAccountName: service-account-deploy
       containers:
       - image: postgres:14.4-alpine
         imagePullPolicy: Always
@@ -29,12 +30,19 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            cpu: 400m
+            memory: 100Mi
+          limits:
+            cpu: 600m
+            memory: 200Mi
   volumeClaimTemplates:
   - metadata:
       name: data
     spec:
       resources:
         requests:
-          storage: 1Mi
+          storage: 1Gi
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: ""

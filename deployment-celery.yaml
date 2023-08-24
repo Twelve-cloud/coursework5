@@ -20,6 +20,7 @@ spec:
       labels:
         app: backend-celery
     spec:
+      serviceAccountName: service-account-deploy
       containers:
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
@@ -34,6 +35,13 @@ spec:
         - prefix: CONFIG_
           configMapRef:
             name: configmap-backend
+        resources:
+          requests:
+            cpu: 100m
+            memory: 500Mi
+          limits:
+            cpu: 200m
+            memory: 800Mi
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
         command: ["./celerybeat-entrypoint.sh"]

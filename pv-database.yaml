@@ -4,7 +4,7 @@ metadata:
   name: pv-database-0
 spec:
   capacity:
-    storage: 1Mi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
@@ -17,7 +17,7 @@ metadata:
   name: pv-database-1
 spec:
   capacity:
-    storage: 1Mi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
@@ -30,7 +30,7 @@ metadata:
   name: pv-database-2
 spec:
   capacity:
-    storage: 1Mi
+    storage: 1Gi
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Recycle
