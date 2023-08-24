@@ -1,0 +1,9 @@
+apiVersion: v1
+data:
+  DEBUG: "true"
+  ALLOWED_HOSTS: "*"
+  CONN_MAX_AGE: "0"
+kind: ConfigMap
+metadata:
+  name: configmap-backend
+  namespace: deploy

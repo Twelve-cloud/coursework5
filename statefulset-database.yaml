@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: statefulset-database
+  namespace: deploy
+spec:
+  serviceName: service-database-headless
+  replicas: 3
+  minReadySeconds: 10
+  selector:
+    matchLabels:
+      app: database-postgres
+  template:
+    metadata:
+      name: pod-database
+      labels:
+        app: database-postgres
+    spec:
+      serviceAccountName: service-account-deploy
+      containers:
+      - image: postgres:14.4-alpine
+        imagePullPolicy: Always
+        name: database
+        ports:
+        - containerPort: 5432
+          protocol: TCP
+        envFrom:
+        - secretRef:
+            name: secret-backend
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/postgresql/data
+        resources:
+          requests:
+            cpu: 400m
+            memory: 100Mi
+          limits:
+            cpu: 600m
+            memory: 200Mi
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      resources:
+        requests:
+          storage: 1Gi
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: ""

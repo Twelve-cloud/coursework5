@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-database-headless
+  namespace: deploy
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 80
+  selector:
+    app: database-postgres

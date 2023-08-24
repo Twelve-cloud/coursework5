@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-migrations
+  namespace: deploy
+spec:
+  template:
+    metadata:
+      name: migrations-pod
+      labels:
+        app: migrations-backend
+    spec:
+      serviceAccountName: service-account-deploy
+      containers:
+      - image: twelvecloud/coursework5:backend
+        imagePullPolicy: Always
+        command: ["./migrations-entrypoint.sh"]
+        name: migrations
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        envFrom:
+        - secretRef:
+            name: secret-backend
+        - prefix: CONFIG_
+          configMapRef:
+            name: configmap-backend
+        resources:
+          requests:
+            cpu: 700m
+            memory: 500Mi
+          limits:
+            cpu: 1
+            memory: 800Mi
+      restartPolicy: OnFailure

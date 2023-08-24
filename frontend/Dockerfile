@@ -1,5 +1,5 @@
 # 1 layer
-FROM node:19-alpine
+FROM node:20.5.1-alpine3.18
 
 WORKDIR /app
 # 2 layer

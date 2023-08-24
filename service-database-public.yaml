@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-database-public
+  namespace: deploy
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 5432
+  selector:
+    app: database-postgres

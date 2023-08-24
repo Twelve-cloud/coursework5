@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: limit-range-deploy
+  namespace: deploy
+spec:
+  limits:
+  - type: Pod
+    min:
+      cpu: 100m
+      memory: 100Mi
+    max:
+      cpu: 1
+      memory: 1Gi
+  - type: Container
+    defaultRequest:
+      cpu: 100m
+      memory: 100Mi
+    default:
+      cpu: 200m
+      memory: 200Mi
+    min:
+      cpu: 100m
+      memory: 100Mi
+    max:
+      cpu: 1
+      memory: 800Mi
+  - type: PersistentVolumeClaim
+    min:
+      storage: 1Gi
+    max:
+      storage: 2Gi
