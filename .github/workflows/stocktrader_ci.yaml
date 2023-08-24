@@ -62,6 +62,12 @@ jobs:
       - name: set up database replication
         run: ./postgres-replication.sh
 
+      - name: test
+        run: kubectl get services -n deploy
+
+      - name: test2
+        run: kubectl run -it srvlookup --image=tutum/dnsutils --rm -restart=Never -- dig SRV service-database-headless.deploy.svc.cluster.local
+
       - name: run tests for stocktrader-core-app
         run: cd stocktrader && poetry run pytest --cov=.
 
