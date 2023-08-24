@@ -47,6 +47,9 @@ jobs:
       - name: create database public service
         run: kubectl create -f service-database-public.yaml
 
+      - name: create pv
+        run: kubectl create -f pv-database.yaml
+
       - name: create database
         run: kubectl create -f statefulset-database.yaml
 
