@@ -69,6 +69,9 @@ run:
 	kubectl create -f deployment-frontend.yaml
 	kubectl rollout status deployment deployment-frontend -n deploy
 
+	kubectl create -f hpa-frontend.yaml
+	while ! kubectl get hpa hpa-frontend -n deploy &> /dev/null; do echo "Waiting for hpa-backend. CTRL-C to exit."; sleep 1; done
+
 start:
 	minikube start
 
