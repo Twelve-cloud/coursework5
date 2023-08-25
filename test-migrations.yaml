@@ -1,21 +1,21 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: job-test
+  name: test-migrations
   namespace: deploy
 spec:
   template:
     metadata:
-      name: test-pod
+      name: migrations-pod
       labels:
-        app: test-backend
+        app: migrations-backend
     spec:
       serviceAccountName: service-account-deploy
       containers:
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
-        command: ["poetry run python manage.py migrate --database=master && poetry run pytest --cov=."]
-        name: test
+        command: ["./migrations-entrypoint.sh"]
+        name: migrations
         ports:
         - containerPort: 8000
           protocol: TCP

@@ -29,9 +29,6 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@master
 
-      - name: test
-        run: kubectl describe node
-
       - name: create namespace
         run: kubectl create -f namespace.yaml
 
@@ -54,13 +51,19 @@ jobs:
         run: kubectl create -f pv-database.yaml
 
       - name: create database
-        run: kubectl create -f statefulset-database.yaml
+        run: kubectl create -f test-statefulset.yaml
 
       - name: wait database
-        run: kubectl rollout status statefulset statefulset-database -n deploy
+        run: kubectl rollout status statefulset test-statefulset -n deploy
 
       - name: create migrations
-        run: kubectl create -f job-migrations.yaml
+        run: kubectl create -f test-migrations.yaml
+
+      - name: migrations?
+        run: while kubectl describe pods -n deploy; do echo "Waiting for service-rabbitmq. CTRL-C to exit."; sleep 1; done
+
+      - name: wait migrations
+        run: kubectl wait --for=condition=complete job/test-migrations --timeout=-30s -n deploy
 
       - name: give access to database replication script
         run: chmod +x postgres-replication.sh
@@ -69,10 +72,10 @@ jobs:
         run: ./postgres-replication.sh
 
       - name: run tests for stocktrader-core-app
-        run: kubectl create -f job-test.yaml
+        run: kubectl create -f test-job.yaml
 
       - name: wait tests
-        run: kubectl wait --for=condition=complete job/job-test --timeout=-30s -n deploy
+        run: kubectl wait --for=condition=complete job/test-job --timeout=-30s -n deploy
 
       - name: run linter for stocktrader-core-app
         run: cd stocktrader && poetry run flake8 .
