@@ -59,12 +59,6 @@ jobs:
       - name: create migrations
         run: kubectl create -f job-migrations.yaml
 
-      - name: migrations?
-        run: while kubectl describe pods -n deploy; do echo "Waiting for service-rabbitmq. CTRL-C to exit."; sleep 1; done
-
-      - name: wait migrations
-        run: kubectl wait --for=condition=complete job/job-migrations --timeout=-30s -n deploy
-
       - name: give access to database replication script
         run: chmod +x postgres-replication.sh
 
