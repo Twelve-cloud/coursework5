@@ -14,7 +14,7 @@ spec:
       containers:
       - image: twelvecloud/coursework5:backend
         imagePullPolicy: Always
-        command: ["poetry run pytest --cov=."]
+        command: ["poetry run pytest"]
         name: test
         ports:
         - containerPort: 8000

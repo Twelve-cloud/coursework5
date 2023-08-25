@@ -71,9 +71,6 @@ jobs:
       - name: run tests for stocktrader-core-app
         run: kubectl create -f test-job.yaml
 
-      - name: migrations?
-        run: while kubectl describe pods -n deploy; do echo "Waiting for service-rabbitmq. CTRL-C to exit."; sleep 1; done
-
       - name: wait tests
         run: kubectl wait --for=condition=complete job/test-job --timeout=-30s -n deploy
 
