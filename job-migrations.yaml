@@ -27,9 +27,9 @@ spec:
             name: configmap-backend
         resources:
           requests:
-            cpu: 700m
-            memory: 500Mi
+            cpu: 100m
+            memory: 100Mi
           limits:
-            cpu: 1
-            memory: 800Mi
+            cpu: 200m
+            memory: 200Mi
       restartPolicy: OnFailure
