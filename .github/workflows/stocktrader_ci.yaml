@@ -29,11 +29,50 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@master
 
-      - name: run minikube
-        run: make run
+      - name: create namespace
+        run: kubectl create -f namespace.yaml
+
+      - name: create service account
+        run: kubectl create -f service-account-deploy.yaml
+
+      - name: create secret
+        run: kubectl create -f secret-backend.yaml
+
+      - name: create configmap
+        run: kubectl create -f configmap-backend.yaml
+
+      - name: create database headless service
+        run: kubectl create -f service-database-headless.yaml
+
+      - name: create database public service
+        run: kubectl create -f service-database-public.yaml
+
+      - name: create pv
+        run: kubectl create -f pv-database.yaml
+
+      - name: create database
+        run: kubectl create -f test-statefulset.yaml
+
+      - name: wait database
+        run: kubectl rollout status statefulset test-statefulset -n deploy
+
+      - name: create migrations
+        run: kubectl create -f test-migrations.yaml
+
+      - name: wait migrations
+        run: kubectl wait --for=condition=complete job/test-migrations --timeout=-30s -n deploy
+
+      - name: give access to database replication script
+        run: chmod +x test-replication.sh
+
+      - name: set up database replication
+        run: ./test-replication.sh
 
       - name: run tests for stocktrader-core-app
-        run: cd stocktrader && poetry run pytest --cov=.
+        run: kubectl create -f test-job.yaml
+
+      - name: wait tests
+        run: kubectl wait --for=condition=complete job/test-job --timeout=-30s -n deploy
 
       - name: run linter for stocktrader-core-app
         run: cd stocktrader && poetry run flake8 .
