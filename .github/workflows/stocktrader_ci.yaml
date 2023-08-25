@@ -29,6 +29,9 @@ jobs:
         id: minikube
         uses: medyagh/setup-minikube@master
 
+      - name: test
+        run: kubectl describe node
+
       - name: create namespace
         run: kubectl create -f namespace.yaml
 
