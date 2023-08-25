@@ -63,10 +63,10 @@ jobs:
         run: kubectl wait --for=condition=complete job/test-migrations --timeout=-30s -n deploy
 
       - name: give access to database replication script
-        run: chmod +x postgres-replication.sh
+        run: chmod +x test-replication.sh
 
       - name: set up database replication
-        run: ./postgres-replication.sh
+        run: ./test-replication.sh
 
       - name: run tests for stocktrader-core-app
         run: kubectl create -f test-job.yaml
